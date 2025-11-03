@@ -1,0 +1,486 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedsharepointonline_53863"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_onedriveforbusiness": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedonedriveforbusiness_fec11"
+        },
+        "api": {
+          "name": "shared_onedriveforbusiness"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)": {
+          "defaultValue": "https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter-Proctors",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645"
+          }
+        },
+        "Certifications (sc_shared_sharepointonline_3da07db0c70041a5a8d062f690e65c33)": {
+          "defaultValue": "51be9a17-6309-4b7e-a54f-a25eb2e75edf",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_3da07db0c70041a5a8d062f690e65c33"
+          }
+        },
+        "Module Submissions (sc_shared_sharepointonline_8718b7b62d2f4b599968ee3d54611880)": {
+          "defaultValue": "e5341daf-a469-46e7-be6f-40cc6183e771",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_8718b7b62d2f4b599968ee3d54611880"
+          }
+        },
+        "CertificatePath (sc_Certificate)": {
+          "defaultValue": "/Certifications",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_Certificate"
+          }
+        },
+        "CertificateFile (sc_CertificateFile)": {
+          "defaultValue": "/Certifications/Certificate.docx",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_CertificateFile"
+          }
+        },
+        "StudentRecordPath (sc_StudentRecordPath)": {
+          "defaultValue": "/Module Submissions",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_StudentRecordPath"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "f002d667-c4af-46d0-bb9f-2be4e37c6eee"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Student Name",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "Module",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_2": {
+                  "title": "Student ID",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_3": {
+                  "title": "Module ID",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_4": {
+                  "title": "Module Internal",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text",
+                "text_1",
+                "text_2",
+                "text_3",
+                "text_4"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Create_Certificate": {
+          "runAfter": {
+            "Get_Certificate_File": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6f08cf87-b68f-45f7-a299-182c73541af9"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "CreateFile",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "folderPath": "@parameters('CertificatePath (sc_Certificate)')",
+              "name": "@{triggerBody()['text']}-@{triggerBody()['text_1']}.docx",
+              "body": "@body('Get_Certificate_File')"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          },
+          "runtimeConfiguration": {
+            "contentTransfer": {
+              "transferMode": "Chunked"
+            }
+          }
+        },
+        "Update_Certificate": {
+          "runAfter": {
+            "Create_Certificate": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "2deff740-521f-4415-b114-d0f883631460"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "PatchFileItem",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Certifications (sc_shared_sharepointonline_3da07db0c70041a5a8d062f690e65c33)')",
+              "id": "@outputs('Create_Certificate')?['body/ItemId']",
+              "item/vName": "@triggerBody()['text']",
+              "item/vMMT": "@triggerBody()['text_1']",
+              "item/vDate": "@utcNow()"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Get_Custom_Certificate": {
+          "runAfter": {
+            "Update_Certificate": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "77e59707-1341-4470-9322-2f6e6d9daa53"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetFileContent",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "id": "@outputs('Update_Certificate')?['body/{Identifier}']",
+              "inferContentType": true
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Create_file_in_Onedrive": {
+          "runAfter": {
+            "Get_Custom_Certificate": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c73cc976-e41f-4e28-be76-191c824f469e"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_onedriveforbusiness",
+              "operationId": "CreateFile",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_onedriveforbusiness"
+            },
+            "parameters": {
+              "folderPath": "/Automate",
+              "name": "@outputs('Update_Certificate')?['body/{FilenameWithExtension}']",
+              "body": "@body('Get_Custom_Certificate')"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          },
+          "runtimeConfiguration": {
+            "contentTransfer": {
+              "transferMode": "Chunked"
+            }
+          }
+        },
+        "Convert_file": {
+          "runAfter": {
+            "Create_file_in_Onedrive": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "19805474-10d8-4b93-9371-a5d7cf13839e"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_onedriveforbusiness",
+              "operationId": "ConvertFile",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_onedriveforbusiness"
+            },
+            "parameters": {
+              "id": "@outputs('Create_file_in_Onedrive')?['body/Id']",
+              "type": "PDF"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Reimport_Certificate": {
+          "runAfter": {
+            "Convert_file": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "31e10649-f7ff-4833-a5ce-32510a541050"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "CreateFile",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "folderPath": "@parameters('StudentRecordPath (sc_StudentRecordPath)')",
+              "name": "@{triggerBody()['text_2']}-@{triggerBody()['text_3']}-C.pdf",
+              "body": "@body('Convert_file')"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          },
+          "runtimeConfiguration": {
+            "contentTransfer": {
+              "transferMode": "Chunked"
+            }
+          }
+        },
+        "Get_Certificate_File": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "372bc519-1338-41ed-aee5-60c360cca4e1"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetFileContentByPath",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "path": "@parameters('CertificateFile (sc_CertificateFile)')",
+              "inferContentType": true
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Delete_OneDrive_file": {
+          "runAfter": {
+            "Reimport_Certificate": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "28c3e185-9544-468a-90e9-dd8efbece7d2"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_onedriveforbusiness",
+              "operationId": "DeleteFile",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_onedriveforbusiness"
+            },
+            "parameters": {
+              "id": "@outputs('Create_file_in_Onedrive')?['body/Id']"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Delete_Sharepoint_file": {
+          "runAfter": {
+            "Delete_OneDrive_file": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "214f1a6a-a067-4a1b-b70e-8b1de5bc0393"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "DeleteFile",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "id": "@outputs('Update_Certificate')?['body/{Identifier}']"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Create_sharing_link_for_a_file_or_folder": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "48e41e90-014d-42b3-bd1e-b97399152cbd"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "link": "@outputs('Create_sharing_link_for_a_file_or_folder')?['body/link/webUrl']"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "link": {
+                  "title": "Link",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "Update_Certificate_file_properties": {
+          "runAfter": {
+            "Delete_Sharepoint_file": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "ab8f5713-92b0-4654-ae08-7f5259f9bbae"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "PatchFileItem",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Module Submissions (sc_shared_sharepointonline_8718b7b62d2f4b599968ee3d54611880)')",
+              "id": "@outputs('Reimport_Certificate')?['body/ItemId']",
+              "item/StudentID": "@triggerBody()['text_2']",
+              "item/ModuleID": "@triggerBody()['text_4']",
+              "item/DocumentType/Value": "Certificate",
+              "item/SubmissionDate": "@utcNow()",
+              "item/GradedDate": "@utcNow()"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Create_sharing_link_for_a_file_or_folder": {
+          "runAfter": {
+            "Update_Certificate_file_properties": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "475cea52-bd0e-4a39-b4ab-84b513e5a9fd"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "CreateSharingLink",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Module Submissions (sc_shared_sharepointonline_8718b7b62d2f4b599968ee3d54611880)')",
+              "id": "@outputs('Update_Certificate_file_properties')?['body/ID']",
+              "permission/type": "view",
+              "permission/scope": "organization"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

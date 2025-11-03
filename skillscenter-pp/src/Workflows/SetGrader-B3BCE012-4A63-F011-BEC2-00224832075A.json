@@ -1,0 +1,170 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedsharepointonline_53863"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)": {
+          "defaultValue": "bf4f59de-896f-425d-8ec6-6c94b83a4264",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2"
+          }
+        },
+        "CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)": {
+          "defaultValue": "https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter-Proctors",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "6989a710-cddb-4fa3-8b37-8987e6f7472d"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Grader",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "Grades ID",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_2": {
+                  "title": "Clear",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text",
+                "text_1",
+                "text_2"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Condition": {
+          "actions": {
+            "Update_Grader": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "347404ec-c38f-4f95-8be8-ae00c316991b"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchItem",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+                  "table": "@parameters('Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)')",
+                  "id": "@triggerBody()['text_1']",
+                  "item/RawScore": "@triggerBody()['text']"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            }
+          },
+          "runAfter": {},
+          "else": {
+            "actions": {
+              "Clear_Grader": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "9d9a4d42-d1a2-4e95-83bb-16274ed0a0bf"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "connectionName": "shared_sharepointonline",
+                    "operationId": "PatchItem",
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                  },
+                  "parameters": {
+                    "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+                    "table": "@parameters('Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)')",
+                    "id": "@triggerBody()['text_1']",
+                    "item/RawScore": "Reassigned"
+                  },
+                  "authentication": "@parameters('$authentication')"
+                }
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@triggerBody()['text_2']",
+              "false"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e79359de-25c7-4e72-bc3a-e266bb5bef45"
+          },
+          "type": "If"
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Condition": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "4aae67a6-9b5c-4c83-8af3-2853f6dfa559"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {},
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

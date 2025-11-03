@@ -1,0 +1,1430 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedsharepointonline_53863"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)": {
+          "defaultValue": "d8f4f3b3-7691-480c-b6d8-98e78c0384c9",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b"
+          }
+        },
+        "Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)": {
+          "defaultValue": "bf4f59de-896f-425d-8ec6-6c94b83a4264",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2"
+          }
+        },
+        "CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)": {
+          "defaultValue": "https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter-Proctors",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645"
+          }
+        },
+        "Admin (new_shared_sharepointonline_6d567fd81de34f9dbe3ed65d256afd51)": {
+          "defaultValue": "a2c95619-575a-4912-bfaa-734256730ec6",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_shared_sharepointonline_6d567fd81de34f9dbe3ed65d256afd51"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "42d987b4-655c-4103-b0bd-105c5a0324f5"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Email",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Get_Student_Summary_Item": {
+          "runAfter": {
+            "Initialize_variable_17": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "19f91e01-77c4-4172-b337-adef848204c6"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)')",
+              "$filter": "StudentEmail eq '@{triggerBody()['text']}'",
+              "$top": 1
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Compose_ExpectedHours": {
+          "runAfter": {
+            "Apply_to_Grades": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e427cd12-ead4-4478-a295-28727951e0fc"
+          },
+          "type": "Compose",
+          "inputs": "@mul(\n  float(outputs('Get_Student_Summary_Exact_Item')?['body/CreditHours']),\n  12.5\n)"
+        },
+        "Compose_ModulePct": {
+          "runAfter": {
+            "Compose_ExpectedHours": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "65a874e7-cd24-4a51-95ca-bf923628e6dc"
+          },
+          "type": "Compose",
+          "inputs": "@mul(\n  if(equals(outputs('Get_Student_Summary_Exact_Item')?['body/Class'],'3456'),70,80),\n  min(\n    if(\n      equals(float(variables('ModuleHours')), 0),\n      0,\n      div(\n        float(variables('ModuleHours')),\n        float(outputs('Compose_ExpectedHours'))\n      )\n    ),\n    1\n  )\n)"
+        },
+        "Get_Student_Summary_Exact_Item": {
+          "runAfter": {
+            "IsEmpty_Student": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "5043ce6e-9422-44ec-8ef5-9480120ff319"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItem",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)')",
+              "id": "@first(body('Get_Student_Summary_item')?['value'])?['ID']"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Get_Admin_Item": {
+          "runAfter": {
+            "Compose_ModulePct": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "15ef9438-102a-4e0e-b327-df71c73402fe"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Admin (new_shared_sharepointonline_6d567fd81de34f9dbe3ed65d256afd51)')",
+              "$filter": "Title eq '@{outputs('Get_Student_Summary_Exact_Item')?['body/Semester']}'",
+              "$top": 1
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Initialize_variable": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "aa66bd8c-2be7-4275-a326-c999e2783582"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "StartDate",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_2": {
+          "runAfter": {
+            "Initialize_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "23e8954a-dbc3-4549-a25e-ce2814db8dd4"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "EndDate",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Compose_DaysSinceStart": {
+          "runAfter": {
+            "Compose_DaysInSemester": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f807b9dd-a1ca-4a17-a6b3-5507777dfad9"
+          },
+          "type": "Compose",
+          "inputs": "@if(\n  lessOrEquals(utcNow(), variables('StartDate')),\n  0,\n  if(\n    greaterOrEquals(utcNow(), variables('EndDate')),\n    outputs('Compose_DaysInSemester'),\n    add(\n      div(\n        sub(ticks(utcNow()), ticks(variables('StartDate'))),\n        864000000000\n      ),\n      1\n    )\n  )\n)"
+        },
+        "Initialize_variable_3": {
+          "runAfter": {
+            "Initialize_variable_2": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "59b5cdac-ab34-4bd0-9d43-609c432c6665"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "CompletedArray",
+                "type": "array",
+                "value": []
+              }
+            ]
+          }
+        },
+        "Initialize_variable_4": {
+          "runAfter": {
+            "Initialize_variable_3": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a941e584-f47c-449d-b660-e7877223bd2a"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "InProgressArray",
+                "type": "array",
+                "value": []
+              }
+            ]
+          }
+        },
+        "Get_Grade_items": {
+          "runAfter": {
+            "Get_Student_Summary_Exact_Item": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "62aaa87c-de9b-4cc0-a9cc-871f31c7239d"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)')",
+              "$filter": "Test/Id eq @{outputs('Get_Student_Summary_Exact_Item')?['body/ID']}"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Apply_to_Grades": {
+          "foreach": "@outputs('Get_Grade_items')?['body/value']",
+          "actions": {
+            "Compose": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "2f548311-f6a1-4875-b3f6-8df43bd80be3"
+              },
+              "type": "Compose",
+              "inputs": "@items('Apply_to_Grades')?['Module/Value']"
+            },
+            "Condition": {
+              "actions": {
+                "Append_to_Completed_array": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "f4ef8c9a-1d4a-4291-8eaf-a020ee7baeda"
+                  },
+                  "type": "AppendToArrayVariable",
+                  "inputs": {
+                    "name": "CompletedArray",
+                    "value": "@items('Apply_to_Grades')?['Module/Value']"
+                  }
+                },
+                "Append_to_Date_array": {
+                  "runAfter": {
+                    "Append_to_Completed_array": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "104af30c-9950-4db4-b47a-e3bece11e713"
+                  },
+                  "type": "AppendToArrayVariable",
+                  "inputs": {
+                    "name": "Dates",
+                    "value": "@items('Apply_to_Grades')?['SubmissionDate']"
+                  }
+                },
+                "Compose_ModuleHours": {
+                  "runAfter": {
+                    "Append_to_Date_array": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "42f33a57-7598-4b88-8a3b-c0a03867b123"
+                  },
+                  "type": "Compose",
+                  "inputs": "@add(variables('ModuleHours'),float(items('Apply_to_Grades')?['ModuleID_x003a__x0020_ModuleHour/Value']))"
+                },
+                "Set_ModuleHours": {
+                  "runAfter": {
+                    "Compose_ModuleHours": [
+                      "Succeeded"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "d44ed62c-38bc-4672-aec4-349eae66fde7"
+                  },
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "ModuleHours",
+                    "value": "@outputs('Compose_ModuleHours')"
+                  }
+                },
+                "Check_IfSeminar": {
+                  "actions": {
+                    "Compose_SeminarCount": {
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "1899f890-dcf8-4815-b31b-c35763ded9df"
+                      },
+                      "type": "Compose",
+                      "inputs": "@add(variables('SeminarCount'),1)"
+                    },
+                    "Set_SeminarCount": {
+                      "runAfter": {
+                        "Compose_SeminarCount": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "a170e838-13f0-43fc-ab4f-9748ae81aa64"
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "SeminarCount",
+                        "value": "@outputs('Compose_SeminarCount')"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Set_ModuleHours": [
+                      "Succeeded"
+                    ]
+                  },
+                  "expression": {
+                    "contains": [
+                      "@items('Apply_to_Grades')?['Module/Value']",
+                      "Seminar"
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "e916ab28-a6d5-4a00-a965-36f6ebd5406b"
+                  },
+                  "type": "If"
+                }
+              },
+              "runAfter": {
+                "Condition:_Check_Intro": [
+                  "Succeeded"
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Append_to_InProgress_array": {
+                    "runAfter": {},
+                    "metadata": {
+                      "operationMetadataId": "286377f2-42f8-42b3-b608-7e6602e5d2ef"
+                    },
+                    "type": "AppendToArrayVariable",
+                    "inputs": {
+                      "name": "InProgressArray",
+                      "value": "@items('Apply_to_Grades')?['Module/Value']"
+                    }
+                  },
+                  "Append_to_Date_array_2": {
+                    "runAfter": {
+                      "Append_to_InProgress_array": [
+                        "Succeeded"
+                      ]
+                    },
+                    "metadata": {
+                      "operationMetadataId": "d69b9a71-c64c-44b5-83c9-5c4f902f62a8"
+                    },
+                    "type": "AppendToArrayVariable",
+                    "inputs": {
+                      "name": "Dates",
+                      "value": "@items('Apply_to_Grades')?['SubmissionDate']"
+                    }
+                  }
+                }
+              },
+              "expression": {
+                "equals": [
+                  "@items('Apply_to_Grades')?['Status/Value']",
+                  "Completed"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "6f8221ca-8031-4931-9b3f-5ec1faf1e77b"
+              },
+              "type": "If"
+            },
+            "Condition:_Check_Intro": {
+              "actions": {
+                "Set_variable_4": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "c63f607e-f851-480b-97ce-dceac07cb3b2"
+                  },
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "IntroLabMeeting",
+                    "value": true
+                  }
+                }
+              },
+              "runAfter": {
+                "Compose": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "equals": [
+                  "@items('Apply_to_Grades')?['Module/Value']",
+                  "Intro Lab Meeting"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "b21052cd-9888-4620-80c4-62d558a7a237"
+              },
+              "type": "If"
+            }
+          },
+          "runAfter": {
+            "Get_Grade_items": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "096ccaae-0a6b-4337-b0dc-97f456379e13"
+          },
+          "type": "Foreach"
+        },
+        "Apply_to_Dates": {
+          "foreach": "@outputs('Get_Admin_Item')?['body/value']",
+          "actions": {
+            "Set_variable": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "a110cfb0-7ff4-4188-a643-46ec86692c80"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "StartDate",
+                "value": "@items('Apply_to_Dates')?['StartDate']"
+              }
+            },
+            "Set_variable_2": {
+              "runAfter": {
+                "Set_variable": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "15bdd32e-1114-427f-9ac4-ecfb0b71a11d"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "EndDate",
+                "value": "@items('Apply_to_Dates')?['EndDate']"
+              }
+            },
+            "Set_variable_3": {
+              "runAfter": {
+                "Set_variable_2": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "fa90ed61-32bb-4580-bed0-42d0485ab30f"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "MilestoneDates",
+                "value": [
+                  "@items('Apply_to_Dates')?['Milestone1Date']",
+                  "@items('Apply_to_Dates')?['Milestone2Date']",
+                  "@items('Apply_to_Dates')?['Milestone3Date']",
+                  "@items('Apply_to_Dates')?['Milestone4Date']",
+                  "@items('Apply_to_Dates')?['Milestone5Date']",
+                  "@items('Apply_to_Dates')?['Milestone6Date']",
+                  "@items('Apply_to_Dates')?['Milestone7Date']"
+                ]
+              }
+            },
+            "Set_variable_5": {
+              "runAfter": {
+                "Set_variable_3": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "237e7705-05fb-40c3-a0fd-4ac1b6f55a58"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "Version",
+                "value": "@items('Apply_to_Dates')?['AppVersion']"
+              }
+            }
+          },
+          "runAfter": {
+            "Get_Admin_Item": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "8835f769-17f8-41c9-95f8-9031f3b0f9bd"
+          },
+          "type": "Foreach"
+        },
+        "Compose_TotalParticipation": {
+          "runAfter": {
+            "Compose_Multiplier": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "97a443a6-a4e4-47a0-95dd-017702d1f76f"
+          },
+          "type": "Compose",
+          "inputs": "@sub(add(\n  length(variables('completedArray')),\n  length(variables('inprogressArray'))\n), if(equals(variables('IntroLabMeeting'),true),1,0))\n"
+        },
+        "Initialize_variable_5": {
+          "runAfter": {
+            "Initialize_variable_4": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "40716684-2683-4fd6-9fbb-85ab4e1a76d4"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Dates",
+                "type": "array",
+                "value": []
+              }
+            ]
+          }
+        },
+        "Update_item": {
+          "runAfter": {
+            "SeminarPct": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "042bf129-c945-403a-b3a5-06d2f167b93a"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "PatchItem",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)')",
+              "id": "@outputs('Get_Student_Summary_Exact_Item')?['body/ID']",
+              "item/ExpectedHours": "@outputs('Compose_ExpectedHours')",
+              "item/TotalModuleHours": "@outputs('Compose:_TotalModuleHours')",
+              "item/ModulePct": "@outputs('Compose_ModulePct')",
+              "item/TotalSeminars": "@variables('SeminarCount')",
+              "item/SeminarPct": "@outputs('SeminarPct')",
+              "item/BiweeklyReq": "@variables('BiWeeklyReq')",
+              "item/ParticipationPct": "@variables('ParticipationPct')",
+              "item/ExtraCreditHours": "@outputs('Compose:_ExtraCreditHours')",
+              "item/ExtraCreditPct": "@outputs('ExtraCreditPct')",
+              "item/FinalPct": "@add(add(outputs('Compose_ModulePct'),variables('ParticipationPct')),add(outputs('ExtraCreditPct'),outputs('SeminarPct')))",
+              "item/Completed": "@string(variables('CompletedArray'))",
+              "item/InProgress": "@string(variables('InProgressArray'))",
+              "item/SubmissionDates": "@string(variables('Dates'))",
+              "item/TotalModules": "@outputs('Compose_TotalParticipation')",
+              "item/ModulesBy": "@variables('ModulesBy')",
+              "item/NextSubmissionDate": "@variables('NextSubmissionDate')",
+              "item/Multiplier": "@outputs('Compose_Multiplier')"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Initialize_variable_6": {
+          "runAfter": {
+            "Initialize_variable_5": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "cf4935ad-1364-40a6-8fdc-6f433109222e"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "MilestoneDates",
+                "type": "array"
+              }
+            ]
+          }
+        },
+        "Compose_RequiredModules": {
+          "runAfter": {
+            "Compose_TotalParticipation": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e87eea90-4f6d-46d3-a5df-543b2b17e864"
+          },
+          "type": "Compose",
+          "inputs": "@createArray(\n  mul(outputs('Get_Student_Summary_Exact_Item')?['body/CreditHours'], 1),\n  mul(outputs('Get_Student_Summary_Exact_Item')?['body/CreditHours'], 2),\n  mul(outputs('Get_Student_Summary_Exact_Item')?['body/CreditHours'], 3),\n  mul(outputs('Get_Student_Summary_Exact_Item')?['body/CreditHours'], 4),\n  mul(outputs('Get_Student_Summary_Exact_Item')?['body/CreditHours'], 5),\n  mul(outputs('Get_Student_Summary_Exact_Item')?['body/CreditHours'], 6),\n  mul(outputs('Get_Student_Summary_Exact_Item')?['body/CreditHours'], 7)\n)"
+        },
+        "Initialize_variable_7": {
+          "runAfter": {
+            "Initialize_variable_6": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0fdce284-e29f-4151-b1de-b75ca7ebcb52"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "NextIndex",
+                "type": "integer",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "Compose_Index": {
+          "runAfter": {
+            "Compose_RequiredModules": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "8224b846-ffb8-436e-86f6-2f69f85d45bf"
+          },
+          "type": "Compose",
+          "inputs": "@range(0, length(variables('MilestoneDates')))"
+        },
+        "Apply_Index": {
+          "foreach": "@outputs('Compose_Index')",
+          "actions": {
+            "Compose_Milestone": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "cac1034b-f46c-4f89-a4bb-6b77bc13cf99"
+              },
+              "type": "Compose",
+              "inputs": "@json(concat(\n    '{ \"Date\":\"', \n    string(variables('MilestoneDates')[int(item())]),\n    '\",',\n    '\"Req\":', \n    string(outputs('Compose_RequiredModules')[int(item())]), \n    '}'\n))"
+            },
+            "Condition:_Date_Not_Empty": {
+              "actions": {},
+              "runAfter": {
+                "Compose_Milestone": [
+                  "Succeeded"
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Append_to_array_variable": {
+                    "runAfter": {},
+                    "metadata": {
+                      "operationMetadataId": "753691b2-1b4d-4f8c-b9bd-ee48f3e439c4"
+                    },
+                    "type": "AppendToArrayVariable",
+                    "inputs": {
+                      "name": "MasterMilestones",
+                      "value": "@outputs('Compose_Milestone')"
+                    }
+                  }
+                }
+              },
+              "expression": {
+                "equals": [
+                  "@empty(variables('MilestoneDates')[int(item())])",
+                  true
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "b700f545-8292-4e7d-8855-5f3c4bd52e36"
+              },
+              "type": "If"
+            }
+          },
+          "runAfter": {
+            "Compose_Index": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "3365a8af-967f-4580-b8a3-b3ee1735bd3e"
+          },
+          "type": "Foreach"
+        },
+        "Initialize_variable_8": {
+          "runAfter": {
+            "Initialize_variable_7": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "70bacd2d-9323-4ddc-848a-ece90975ca9d"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "MasterMilestones",
+                "type": "array"
+              }
+            ]
+          }
+        },
+        "Parse_JSON": {
+          "runAfter": {
+            "Apply_Index": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "3348f108-c44d-4c77-9e26-56de1e61a3df"
+          },
+          "type": "ParseJson",
+          "inputs": {
+            "content": "@variables('MasterMilestones')",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Date": {
+                    "type": "string"
+                  },
+                  "Req": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "Date",
+                  "Req"
+                ]
+              }
+            }
+          }
+        },
+        "Filter_array": {
+          "runAfter": {
+            "Parse_JSON": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6f534ac8-8c15-47a9-8548-c63492679bab"
+          },
+          "type": "Query",
+          "inputs": {
+            "from": "@body('Parse_JSON')",
+            "where": "@equals(greater(item()?['Req'], outputs('Compose_TotalParticipation')), true)"
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Update_item": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e9c1aa8f-c6e0-4932-8646-cf35a681d1b7"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "status": "200",
+              "studentid": "@{outputs('Update_item')?['body/ID']}",
+              "version": "@{variables('Version')}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "title": "Status",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "studentid": {
+                  "title": "StudentID",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "version": {
+                  "title": "Version",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "Initialize_variable_9": {
+          "runAfter": {
+            "Initialize_variable_8": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "78ec32eb-ba05-4b8c-8bb5-0eb8233c0aaf"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ModuleHours",
+                "type": "float",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "Compose_DaysInSemester": {
+          "runAfter": {
+            "Apply_to_Dates": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "2e40c6f2-18e4-48b1-bf70-0f1fade9eedf"
+          },
+          "type": "Compose",
+          "inputs": "@add(\n  div(\n    sub(ticks(variables('EndDate')), ticks(variables('StartDate'))),\n    864000000000\n  ),\n  1\n)"
+        },
+        "Compose_Multiplier": {
+          "runAfter": {
+            "Compose_DaysSinceStart": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "3f38a1f8-274b-4ea5-b68a-7acf3e123c18"
+          },
+          "type": "Compose",
+          "inputs": "@if(\n  equals(outputs('Compose_DaysSinceStart'), 0),\n  0,\n  div(\n    float(outputs('Compose_DaysInSemester')),\n    float(outputs('Compose_DaysSinceStart'))\n  )\n)"
+        },
+        "ExtraCreditPct": {
+          "runAfter": {
+            "Compose:_ExtraCreditHours": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "312953b6-b184-40c3-bcbe-6093a58f9234"
+          },
+          "type": "Compose",
+          "inputs": "@mul(100,div(float(outputs('Compose:_ExtraCreditHours')), outputs('Compose_ExpectedHours')))"
+        },
+        "SeminarPct": {
+          "runAfter": {
+            "ExtraCreditPct": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e469abfd-e105-4d70-96a3-cb84573ac5f6"
+          },
+          "type": "Compose",
+          "inputs": "@mul(\n  10,\n  min(\n    div(variables('SeminarCount'), float(outputs('Get_Student_Summary_Exact_Item')?['body/CreditHours'])),\n    1\n  )\n)"
+        },
+        "Initialize_variable_10": {
+          "runAfter": {
+            "Initialize_variable_9": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "7eb76b7a-8d4a-470d-a8a3-efa9e52a2dfd"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "SeminarCount",
+                "type": "float"
+              }
+            ]
+          }
+        },
+        "IsEmpty_Student": {
+          "actions": {
+            "Fail_Respond": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "6a96e8fe-b1e9-424c-966c-ab0af324ef17"
+              },
+              "type": "Response",
+              "kind": "PowerApp",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "status": "404",
+                  "version": " "
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "title": "Status",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    },
+                    "studentid": {
+                      "title": "StudentID",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    },
+                    "version": {
+                      "title": "Version",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "Terminate": {
+              "runAfter": {
+                "Fail_Respond": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "a27b42f6-5f51-4868-ba40-b541e309df3b"
+              },
+              "type": "Terminate",
+              "inputs": {
+                "runStatus": "Succeeded"
+              }
+            }
+          },
+          "runAfter": {
+            "Get_Student_Summary_Item": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "and": [
+              {
+                "equals": [
+                  "@empty(outputs('Get_Student_Summary_Item')?['body/value'])",
+                  true
+                ]
+              }
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "2f9537a5-7dd2-4c94-9518-298ba2c5344a"
+          },
+          "type": "If"
+        },
+        "Initialize_variable_11": {
+          "runAfter": {
+            "Initialize_variable_10": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "4864a7c7-6647-4490-a947-31a969be1b32"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "IntroLabMeeting",
+                "type": "boolean",
+                "value": false
+              }
+            ]
+          }
+        },
+        "Compose:_ExtraCreditHours": {
+          "runAfter": {
+            "Compose:_TotalModuleHours": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "197887e6-f1c0-4185-bd15-a3debf6cfbf8"
+          },
+          "type": "Compose",
+          "inputs": "@add(\n        add(\n            add(\n                if(equals(outputs('Get_Student_Summary_Exact_Item')?['body/LabMeeting1'], true), 0.5, 0),\n                if(equals(outputs('Get_Student_Summary_Exact_Item')?['body/LabMeeting2'], true), 0.5, 0)\n            ),\n            if(equals(outputs('Get_Student_Summary_Exact_Item')?['body/LabMeeting3'], true), 0.5, 0)\n        ),\n        if(equals(outputs('Get_Student_Summary_Exact_Item')?['body/LabMeeting4'], true), 0.5, 0)\n    )"
+        },
+        "Initialize_variable_12": {
+          "runAfter": {
+            "Initialize_variable_11": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "dcb447ea-1b24-4497-a1d0-27f7124c4181"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Version",
+                "type": "float"
+              }
+            ]
+          }
+        },
+        "Condition:_If_Empty_Array": {
+          "actions": {
+            "Set_variable_10": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "55c4a612-312d-4805-8d37-44b7fad851b7"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "NextSubmissionDate",
+                "value": "2030-01-01"
+              }
+            },
+            "Set_variable_11": {
+              "runAfter": {
+                "Set_variable_10": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "39b4aeb2-d615-4279-ae5e-511f7dc9a039"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "ParticipationPct",
+                "value": 20
+              }
+            },
+            "Set_variable_12": {
+              "runAfter": {
+                "Set_variable_11": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "30316df1-8326-466a-8660-a76b38a4cce2"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "ModulesBy",
+                "value": 0
+              }
+            },
+            "Set_variable_13": {
+              "runAfter": {
+                "Set_variable_12": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "9371254a-6e28-4fbd-bbfe-a9762d286879"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "BiWeeklyReq",
+                "value": 0
+              }
+            }
+          },
+          "runAfter": {
+            "Filter_array": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Compose_NextMilestone": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "43584c97-44eb-45c6-8bc5-51ea451b9198"
+                },
+                "type": "Compose",
+                "inputs": "@first(body('Filter_array'))"
+              },
+              "Parse_NextMilestone": {
+                "runAfter": {
+                  "Compose_NextMilestone": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "42a3c528-8faa-44ee-a037-2a5347d6fb86"
+                },
+                "type": "ParseJson",
+                "inputs": {
+                  "content": "@outputs('Compose_NextMilestone')",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "Date": {
+                        "type": "string"
+                      },
+                      "Req": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              },
+              "Filter_NextParticipation": {
+                "runAfter": {
+                  "Parse_NextMilestone": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "26efa6d9-97fd-4f18-80e2-deb01bcc51c8"
+                },
+                "type": "Query",
+                "inputs": {
+                  "from": "@body('Parse_JSON')",
+                  "where": "@equals(greater(item()?['Date'], utcNow()), true)"
+                }
+              },
+              "Compose_NextParticipation": {
+                "runAfter": {
+                  "Filter_NextParticipation": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "f6def9da-e576-47ef-82a6-82f3e8332246"
+                },
+                "type": "Compose",
+                "inputs": "@first(body('Filter_NextParticipation'))"
+              },
+              "Parse_NextParticipation": {
+                "runAfter": {
+                  "Compose_NextParticipation": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "93689b88-ef17-4d33-9a76-18f105475ecc"
+                },
+                "type": "ParseJson",
+                "inputs": {
+                  "content": "@outputs('Compose_NextParticipation')",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "Date": {
+                        "type": "string"
+                      },
+                      "Req": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              },
+              "RequiredParticipation": {
+                "runAfter": {
+                  "Parse_NextParticipation": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "1b069330-5480-4ac6-ac50-d67f93b87030"
+                },
+                "type": "Compose",
+                "inputs": "@sub(body('Parse_NextParticipation')?['Req'],outputs('Get_Student_Summary_Exact_Item')?['body/CreditHours'])"
+              },
+              "ParticipationPct": {
+                "runAfter": {
+                  "RequiredParticipation": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "82f3c119-cf14-4733-9b0c-e2776e46df8d"
+                },
+                "type": "Compose",
+                "inputs": "@if(equals(float(outputs('RequiredParticipation')),0), 20, mul(\n  20,\n  min(\n    div(float(outputs('Compose_TotalParticipation')), float(outputs('RequiredParticipation'))),\n    1\n  )\n))"
+              },
+              "Set_variable_6": {
+                "runAfter": {
+                  "ParticipationPct": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "4abc02dd-c73f-49a3-b2f7-088c171d405a"
+                },
+                "type": "SetVariable",
+                "inputs": {
+                  "name": "BiWeeklyReq",
+                  "value": "@outputs('RequiredParticipation')"
+                }
+              },
+              "Set_variable_7": {
+                "runAfter": {
+                  "Set_variable_6": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "8637cdd1-4259-4061-86c2-5f47b8ca15ce"
+                },
+                "type": "SetVariable",
+                "inputs": {
+                  "name": "NextSubmissionDate",
+                  "value": "@body('Parse_NextMilestone')?['Date']"
+                }
+              },
+              "Set_variable_8": {
+                "runAfter": {
+                  "Set_variable_7": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "b76b3ae7-643d-43b3-9bab-d9f9c45ac223"
+                },
+                "type": "SetVariable",
+                "inputs": {
+                  "name": "ModulesBy",
+                  "value": "@sub(body('Parse_NextMilestone')?['Req'],outputs('Compose_TotalParticipation'))"
+                }
+              },
+              "Set_variable_9": {
+                "runAfter": {
+                  "Set_variable_8": [
+                    "Succeeded"
+                  ]
+                },
+                "metadata": {
+                  "operationMetadataId": "e96094ef-5c06-42d9-9af4-39f30c66a0e9"
+                },
+                "type": "SetVariable",
+                "inputs": {
+                  "name": "ParticipationPct",
+                  "value": "@outputs('ParticipationPct')"
+                }
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@empty(body('Filter_array'))",
+              true
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6d4091e7-9e5a-429c-b7be-3c7fe463f0de"
+          },
+          "type": "If"
+        },
+        "Initialize_variable_13": {
+          "runAfter": {
+            "Initialize_variable_12": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "dcb447ea-1b24-4497-a1d0-27f7124c4181"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ParticipationPct",
+                "type": "float",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "Initialize_variable_14": {
+          "runAfter": {
+            "Initialize_variable_13": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "dcb447ea-1b24-4497-a1d0-27f7124c4181"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "NextSubmissionDate",
+                "type": "string",
+                "value": "0"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_15": {
+          "runAfter": {
+            "Initialize_variable_14": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "dcb447ea-1b24-4497-a1d0-27f7124c4181"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ModulesBy",
+                "type": "float",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "Initialize_variable_17": {
+          "runAfter": {
+            "Initialize_variable_15": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "dcb447ea-1b24-4497-a1d0-27f7124c4181"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "BiWeeklyReq",
+                "type": "float"
+              }
+            ]
+          }
+        },
+        "Compose:_TotalModuleHours": {
+          "runAfter": {
+            "Condition:_If_Empty_Array": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c179e782-8f4d-468a-8aed-6f5d3a36d365"
+          },
+          "type": "Compose",
+          "inputs": "@add(\n    variables('ModuleHours'),\n    float(outputs('Get_Student_Summary_Exact_Item')?['body/RolloverHours'])\n)"
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

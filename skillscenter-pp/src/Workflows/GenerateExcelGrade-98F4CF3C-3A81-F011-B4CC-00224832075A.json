@@ -1,0 +1,275 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedsharepointonline_53863"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_excelonlinebusiness": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedexcelonlinebusiness_25d33"
+        },
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)": {
+          "defaultValue": "d8f4f3b3-7691-480c-b6d8-98e78c0384c9",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b"
+          }
+        },
+        "CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)": {
+          "defaultValue": "https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter-Proctors",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "b1c7288c-c679-4128-a87e-ec9bd774a73a"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          }
+        }
+      },
+      "actions": {
+        "Get_StudentSummary": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "9a8c5adc-fb06-4af6-8d47-c62fa3916ff8"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)')"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Select:_Export_to_Excel": {
+          "runAfter": {
+            "Get_StudentSummary": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "2f4e62d1-6450-460c-bcb0-3630d2e712c1"
+          },
+          "type": "Select",
+          "inputs": {
+            "from": "@outputs('Get_StudentSummary')?['body/value']",
+            "select": {
+              "StudentID": "@item()?['Title']",
+              "StudentName": "@item()?['StudentName']",
+              "StudentEmail": "@item()?['StudentEmail']",
+              "Class": "@item()?['Class']",
+              "Semester": "@item()?['Semester']",
+              "CreditHours": "@item()?['CreditHours']",
+              "CurrentGrade": "",
+              "FinalPercent": "@item()?['FinalPct']",
+              "CompletedModuleHours": "@item()?['TotalModuleHours']",
+              "RequiredHours": "@item()?['ExpectedHours']",
+              "ModulePct": "@item()?['ModulePct']",
+              "CompletedSeminars": "@item()?['TotalSeminars']",
+              "RequiredSeminars": "@item()?['CreditHours']",
+              "SeminarPct": "@item()?['SeminarPct']",
+              "CompletedParticipation": "@item()?['TotalModules']",
+              "RequiredParticipation": "@item()?['BiweeklyReq']",
+              "ParticipationPct": "@item()?['ParticipationPct']",
+              "Completed": "@item()?['Completed']",
+              "InProgress": "@item()?['InProgress']",
+              "SubmissionDates": "@item()?['SubmissionDates']"
+            }
+          }
+        },
+        "Compose:_ExcelName": {
+          "runAfter": {
+            "Select:_Export_to_Excel": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "28a623fd-017f-40b5-beec-38a52f6a0dc1"
+          },
+          "type": "Compose",
+          "inputs": "GradebookBackup_@{formatDateTime(utcNow(),'yyyy-MM-dd_hhmmss')}.xlsx"
+        },
+        "Send_an_HTTP_request_to_SharePoint": {
+          "runAfter": {
+            "Compose:_ExcelName": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "125e0337-4c8a-4ec6-b6fa-c7ada09908b8"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "HttpRequest",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "parameters/method": "POST",
+              "parameters/uri": "_api/web/GetFolderByServerRelativeUrl('Shared%20Documents/Proctors/GradebookBackup')/Files/add(url='@{outputs('Compose:_ExcelName')}',overwrite=true)"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Create_CSV_table:_Get_Table_Headers": {
+          "runAfter": {
+            "Send_an_HTTP_request_to_SharePoint": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f34869b2-ab33-48e8-afd1-8afb858d0527"
+          },
+          "type": "Table",
+          "inputs": {
+            "from": "@body('Select:_Export_to_Excel')",
+            "format": "CSV"
+          }
+        },
+        "Create_table:_Gradebook": {
+          "runAfter": {
+            "Create_CSV_table:_Get_Table_Headers": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "01f43ca7-f67b-494a-b644-16dfc427c24c",
+            "tableId": null
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_excelonlinebusiness",
+              "operationId": "CreateTable",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness"
+            },
+            "parameters": {
+              "source": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "drive": "b!RbdVAVeaqUSSQ1lk0fthLMCN_1x1JApEgoSsJN6tVmJ3kdPA8cG6Qb91RTAVWh5D",
+              "file": "@body('Send_an_HTTP_request_to_SharePoint')['d']['UniqueId']",
+              "table/Range": "A1",
+              "table/TableName": "Gradebook",
+              "table/ColumnsNames": "@first(split(body('Create_CSV_table:_Get_Table_Headers'), decodeUriComponent('%0A')))"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Apply_to_each:_Export_to_Excel_Data_Row": {
+          "foreach": "@body('Select:_Export_To_Excel')",
+          "actions": {
+            "Add_a_row_into_a_table:_Export_to_Excel_Data_Row": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "c05acda3-4a6f-452d-af8b-985ff601a0f2",
+                "tableId": "@outputs('Create_table:_Gradebook')?['body/name']"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_excelonlinebusiness",
+                  "operationId": "AddRowV2",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness"
+                },
+                "parameters": {
+                  "source": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+                  "drive": "b!RbdVAVeaqUSSQ1lk0fthLMCN_1x1JApEgoSsJN6tVmJ3kdPA8cG6Qb91RTAVWh5D",
+                  "file": "@body('Send_an_HTTP_request_to_SharePoint')['d']['UniqueId']",
+                  "table": "@outputs('Create_table:_Gradebook')?['body/name']",
+                  "item": "@items('Apply_to_each:_Export_to_Excel_Data_Row')"
+                },
+                "authentication": {
+                  "type": "Raw",
+                  "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Respond_to_a_Power_App_or_flow": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "7376bc87-cc98-4032-a7bc-e1f27d7b8bea"
+          },
+          "type": "Foreach"
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Create_table:_Gradebook": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "5f1da89e-965f-48d7-850a-85ec76a48c48"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {},
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

@@ -1,0 +1,127 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedsharepointonline_53863"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "SkillsCenter (sc_SkillsCenter)": {
+          "defaultValue": "https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_SkillsCenter"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "d252965f-d3dc-4f5c-bb26-a9918070c10e"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "PDF",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Get_file_content": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "bb95a43c-e2b4-48e7-b4b9-ad5f82b6fb03",
+            "%252fShared%2bDocuments%252fGeneral%252fStudent%2bResources%252fFA2025%2bSkillsCenterIntro.pdf": "/Shared Documents/General/Student Resources/FA2025 SkillsCenterIntro.pdf"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetFileContent",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('SkillsCenter (sc_SkillsCenter)')",
+              "id": "%252fShared%2bDocuments%252fGeneral%252fStudent%2bResources%252fFA2025%2bSkillsCenterIntro.pdf",
+              "inferContentType": true
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Compose": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "234527be-66ca-42d3-b109-37bee5df8cae"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "result": "@{outputs('Compose')}"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "title": "Result",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "Compose": {
+          "runAfter": {
+            "Get_file_content": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a623cef0-37ef-4ea3-b450-9ed7e71404c6"
+          },
+          "type": "Compose",
+          "inputs": "@body('Get_file_content')?['$content']"
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

@@ -1,0 +1,106 @@
+{
+  "properties": {
+    "connectionReferences": {},
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "0bc08694-ed6f-4c66-8e76-8dd77d79016f"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Email",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Run_a_Child_Flow": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "42cb0e75-dbd0-4fae-831a-bddc396a7371"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "gradesarray": "@body('Run_a_Child_Flow')?['gradesarray']",
+              "studentsummaryarray": "@body('Run_a_Child_Flow')?['studentsummaryarray']",
+              "status": "@body('Run_a_Child_Flow')?['status']",
+              "version": "@body('Run_a_Child_Flow')?['version']"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "gradesarray": {
+                  "title": "GradesArray",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "studentsummaryarray": {
+                  "title": "StudentSummaryArray",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "status": {
+                  "title": "Status",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "version": {
+                  "title": "Version",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "Run_a_Child_Flow": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "63463694-0273-4ccc-9f58-bdc45ad829d6"
+          },
+          "type": "Workflow",
+          "inputs": {
+            "host": {
+              "workflowReferenceName": "efa70248-8b69-f011-bec1-00224832075a"
+            },
+            "body": {
+              "text": "@triggerBody()['text']"
+            }
+          }
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

@@ -1,0 +1,323 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedsharepointonline_53863"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)": {
+          "defaultValue": "d8f4f3b3-7691-480c-b6d8-98e78c0384c9",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b"
+          }
+        },
+        "CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)": {
+          "defaultValue": "https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter-Proctors",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645"
+          }
+        },
+        "Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)": {
+          "defaultValue": "bf4f59de-896f-425d-8ec6-6c94b83a4264",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "519078da-7929-423a-8905-e534b61bb81c"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Email",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Get_Student_Summary_item": {
+          "runAfter": {
+            "Initialize_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d0609052-4a66-421c-9c5e-158570badf13"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)')",
+              "$filter": "StudentEmail eq '@{triggerBody()['text']}'",
+              "$top": 1
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Get_Grades_Items": {
+          "runAfter": {
+            "Apply_to_each": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "962559e8-6f41-41eb-a21e-a1556dfefe91"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)')",
+              "$filter": "Test/Id eq @{variables('StudentID')}"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Initialize_variable": {
+          "runAfter": {
+            "Condition": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "78b7aa8e-78f3-4d61-b979-be5da7b00c43"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "StudentID",
+                "type": "string",
+                "value": "@body('Run_SyncGrades')?['studentid']"
+              }
+            ]
+          }
+        },
+        "Apply_to_each": {
+          "foreach": "@outputs('Get_Student_Summary_item')?['body/value']",
+          "actions": {
+            "Set_variable": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "a1d23da0-4f12-4319-93b3-f7f19d396254"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "StudentID",
+                "value": "@{items('Apply_to_each')?['ID']}"
+              }
+            }
+          },
+          "runAfter": {
+            "Get_Student_Summary_item": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a974dcf8-3e33-4f9f-9f7a-ecfa5da5222b"
+          },
+          "type": "Foreach"
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Get_Grades_Items": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d1d0eb7a-02d4-4d3a-b76d-64c49c06a3b3"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "studentsummaryarray": "@{outputs('Get_Student_Summary_item')?['body/value']}",
+              "gradesarray": "@{outputs('Get_Grades_Items')?['body/value']}",
+              "status": "200",
+              "version": "@body('Run_SyncGrades')?['version']"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "studentsummaryarray": {
+                  "title": "StudentSummaryArray",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "gradesarray": {
+                  "title": "GradesArray",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "status": {
+                  "title": "Status",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                },
+                "version": {
+                  "title": "Version",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "Run_SyncGrades": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "d8f8fe69-2b9d-40cf-a64b-d7a1a1dca2aa"
+          },
+          "type": "Workflow",
+          "inputs": {
+            "host": {
+              "workflowReferenceName": "4ceb0f94-146f-f011-bec2-00224832075a"
+            },
+            "body": {
+              "text": "@triggerBody()['text']"
+            }
+          }
+        },
+        "Condition": {
+          "actions": {
+            "Respond_to_a_Power_App_or_flow_2": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "8dff5ed7-f4d3-4095-8d40-36068eabaf0a"
+              },
+              "type": "Response",
+              "kind": "PowerApp",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "studentsummaryarray": "{}",
+                  "gradesarray": "{}",
+                  "status": "404",
+                  "version": "@body('Run_SyncGrades')?['version']"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "studentsummaryarray": {
+                      "title": "StudentSummaryArray",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    },
+                    "gradesarray": {
+                      "title": "GradesArray",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "title": "Status",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    },
+                    "version": {
+                      "title": "Version",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "Terminate": {
+              "runAfter": {
+                "Respond_to_a_Power_App_or_flow_2": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "485b37c7-8bb6-478d-9169-710b3f6574a8"
+              },
+              "type": "Terminate",
+              "inputs": {
+                "runStatus": "Failed",
+                "runError": {
+                  "code": "404"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Run_SyncGrades": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "and": [
+              {
+                "equals": [
+                  "@if(equals(body('Run_SyncGrades')?['status'],'404'),true,false)",
+                  true
+                ]
+              }
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "b23bddec-3808-4651-97e7-98aca88fb392"
+          },
+          "type": "If"
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

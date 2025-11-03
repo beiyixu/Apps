@@ -1,0 +1,664 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedsharepointonline_53863"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_teams": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedteams_acb13"
+        },
+        "api": {
+          "name": "shared_teams"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)": {
+          "defaultValue": "bf4f59de-896f-425d-8ec6-6c94b83a4264",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2"
+          }
+        },
+        "CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)": {
+          "defaultValue": "https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter-Proctors",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645"
+          }
+        },
+        "Module Submissions (sc_shared_sharepointonline_8718b7b62d2f4b599968ee3d54611880)": {
+          "defaultValue": "e5341daf-a469-46e7-be6f-40cc6183e771",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_8718b7b62d2f4b599968ee3d54611880"
+          }
+        },
+        "StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)": {
+          "defaultValue": "d8f4f3b3-7691-480c-b6d8-98e78c0384c9",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "82e606e6-f042-49d5-acdb-00176773d7d0"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Id",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "Feedback",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_2": {
+                  "title": "Grader",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_3": {
+                  "title": "Plan",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_4": {
+                  "title": "Materials",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_5": {
+                  "title": "Data",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_6": {
+                  "title": "Conclusion",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_7": {
+                  "title": "Citation",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_8": {
+                  "title": "Format",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_9": {
+                  "title": "MMTCheck",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text",
+                "text_1",
+                "text_2",
+                "text_3",
+                "text_4",
+                "text_5",
+                "text_6",
+                "text_7",
+                "text_8",
+                "text_9"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Initialize_Plan_variable": {
+          "runAfter": {
+            "Scope": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "fb086ab1-2a94-410c-94a2-4e84075cbb87"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Plan",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_Materials_variable": {
+          "runAfter": {
+            "Initialize_Plan_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "eb7b560e-007e-439d-9a84-983d0cfbc137"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Materials",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_Data_variable": {
+          "runAfter": {
+            "Initialize_Materials_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "43da4f64-7703-4d84-9a7e-b8c084e6aea0"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Data",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_Conclusion_variable": {
+          "runAfter": {
+            "Initialize_Data_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "42464179-a85b-419d-8885-ab6e4404abf2"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Conclusion",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_Citation_variable": {
+          "runAfter": {
+            "Initialize_Conclusion_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f0268644-4f0f-4240-affe-f6122fafe293"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Citation",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_Format_variable": {
+          "runAfter": {
+            "Initialize_Citation_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "5586d84f-0105-4b97-be98-00589cfd6868"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Format",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_MMTCheck_variable": {
+          "runAfter": {
+            "Initialize_Format_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "88543187-9fcb-480c-81ae-02275571351a"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "MMTCheck",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_8": {
+          "runAfter": {
+            "Initialize_MMTCheck_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "34804b69-80b5-4314-98b4-1529b174efb1"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Feed",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Condition": {
+          "actions": {
+            "Set_variable": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "d24e131c-9162-4fe6-9f99-a69270347663"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "Plan",
+                "value": "https://static.vecteezy.com/system/resources/previews/017/177/933/non_2x/round-check-mark-symbol-with-transparent-background-free-png.png"
+              }
+            }
+          },
+          "runAfter": {
+            "Initialize_variable_8": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Set_variable_2": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "517614f7-bbc2-44a2-a8d4-538dbbff8900"
+                },
+                "type": "SetVariable",
+                "inputs": {
+                  "name": "Plan",
+                  "value": "https://static.vecteezy.com/system/resources/previews/017/178/222/non_2x/round-cross-mark-symbol-with-transparent-background-free-png.png"
+                }
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@triggerBody()['text_3']",
+              true
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "25f2be1c-6016-406b-b5f9-6bf5f6b63d54"
+          },
+          "type": "If"
+        },
+        "Update_item": {
+          "runAfter": {
+            "Set_Json_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "febedca0-973a-4ba3-bc8c-56ece6be20c2"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "PatchItem",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)')",
+              "id": "@outputs('Get_item')?['body/ID']",
+              "item/Status/Value": "Needs Revisions",
+              "item/RawScore": "@triggerBody()['text_2']",
+              "item/ProctorComments": "@triggerBody()['text_1']",
+              "item/PlanningScore": "@if(equals(triggerBody()?['text_3'], 'true'), 1, 0)\n",
+              "item/MethodsScore": "@if(equals(triggerBody()['text_4'], 'true'), 1, 0)\n",
+              "item/AnalysisScore": "@if(equals(triggerBody()?['text_5'], 'true'), 1, 0)\n",
+              "item/ConclusionScore": "@if(equals(triggerBody()?['text_6'], 'true'), 1, 0)\n",
+              "item/CitationsScore": "@if(equals(triggerBody()?['text_7'], 'true'), 1, 0)\n",
+              "item/FormatScore": "@if(equals(triggerBody()?['text_8'], 'true'), 1, 0)\n",
+              "item/MasteryScore": "@if(equals(triggerBody()?['text_9'], 'true'), 1, 0)\n",
+              "item/RejectionHistory": "@variables('varJson')"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Send_Card": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f1d0e466-ab09-4401-bed5-bb6bf2ff34f1"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {},
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "Initialize_ID_variable": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "27757be1-75d2-4d9e-b9bd-a0806d4bdb8f"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ID",
+                "type": "string",
+                "value": "@triggerBody()['text']"
+              }
+            ]
+          }
+        },
+        "Get_file_metadata": {
+          "runAfter": {
+            "Update_item": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f78e8f99-80e3-4cda-af8f-88b6d9c4d650"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetFileMetadata",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "id": "@outputs('Update_item')?['body/StudentRecordID']"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Get_item": {
+          "runAfter": {
+            "Initialize_ID_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0ae21248-c6dc-48f4-9c23-be1765b4b7bc"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItem",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)')",
+              "id": "@variables('ID')"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "ComposeRejection": {
+          "runAfter": {
+            "Compose:_CommaDelete": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f398f1c8-f51a-4508-959c-4e74fb8ec8ef"
+          },
+          "type": "Compose",
+          "inputs": "@concat(\n  '{',\n    '\"Attempt\":',        string(body('Get_item')?['Attempts']), ',', \n    '\"Feedback\":\"',  outputs('Compose:_CommaDelete'), '\",',\n    '\"PlanningScore\":',  triggerBody()['text_3'], ',', \n    '\"MethodsScore\":',   triggerBody()['text_4'], ',', \n    '\"AnalysisScore\":',  triggerBody()['text_5'], ',', \n    '\"ConclusionScore\":',triggerBody()['text_6'], ',', \n    '\"CitationsScore\":', triggerBody()['text_7'], ',', \n    '\"FormatScore\":',    triggerBody()['text_8'], ',', \n    '\"MasteryScore\":',   triggerBody()['text_9'], ',',\n    '\"Link\":\"',          body('Get_item')?['LatestSubmissionLink'], '\"',\n  '}'\n)"
+        },
+        "Initialize_JSON_variable": {
+          "runAfter": {
+            "Get_item": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6f5bd71b-eb82-41a2-a4e3-2a030a25dbb2"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "varJson",
+                "type": "string",
+                "value": "@outputs('Get_item')?['body/RejectionHistory']"
+              }
+            ]
+          }
+        },
+        "Set_Json_variable": {
+          "runAfter": {
+            "ComposeRejection2": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "f850f89a-7e57-4a03-b0de-27db809abdbe"
+          },
+          "type": "SetVariable",
+          "inputs": {
+            "name": "varJson",
+            "value": "@{outputs('ComposeRejection2')}"
+          }
+        },
+        "ComposeRejection2": {
+          "runAfter": {
+            "ComposeRejection": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "41be6b69-c6d6-49d7-876f-0aa7b2376c8b"
+          },
+          "type": "Compose",
+          "inputs": "@string(\n  union(\n    if(\n      empty(body('Get_item')?['RejectionHistory']),\n      json('[]'),\n      json(body('Get_item')?['RejectionHistory'])\n    ),\n    createArray(\n      json(outputs('ComposeRejection'))\n    )\n  )\n)"
+        },
+        "Get_items": {
+          "runAfter": {
+            "Condition": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "768192d7-be6c-44f8-9fd0-d1ef50727177"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)')",
+              "$filter": "Title eq '@{outputs('Get_item')?['body/Test/Value']}'"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Send_Card": {
+          "foreach": "@outputs('Get_items')?['body/value']",
+          "actions": {
+            "Post_card_in_a_chat_or_channel": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "af723157-25b7-42d3-ba37-9df0258c96f4"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_teams",
+                  "operationId": "PostCardToConversation",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams"
+                },
+                "parameters": {
+                  "poster": "Flow bot",
+                  "location": "Chat with Flow bot",
+                  "body/recipient": "@{items('Send_Card')?['StudentEmail']};",
+                  "body/messageBody": "{\n    \"type\": \"AdaptiveCard\",\n    \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n    \"version\": \"1.3\",\n    \"body\": [\n        {\n            \"type\": \"ColumnSet\",\n            \"columns\": [\n                {\n                    \"type\": \"Column\",\n                    \"width\": \"auto\",\n                    \"items\": [\n                        {\n                            \"type\": \"Image\",\n                            \"url\": \"https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Colorado_Buffaloes_logo.svg/1200px-Colorado_Buffaloes_logo.svg.png\",\n                            \"altText\": \"CU\",\n                            \"size\": \"Medium\"\n                        }\n                    ]\n                },\n                {\n                    \"type\": \"Column\",\n                    \"width\": \"stretch\",\n                    \"items\": [\n                        {\n                            \"type\": \"TextBlock\",\n                            \"text\": \"University Of Colorado Boulder\",\n                            \"wrap\": true,\n                            \"size\": \"Medium\",\n                            \"weight\": \"Bolder\",\n                            \"spacing\": \"Small\"\n                        },\n                        {\n                            \"type\": \"TextBlock\",\n                            \"text\": \"MCDB1234/3456 SkillsCenter\",\n                            \"wrap\": true,\n                            \"spacing\": \"Small\"\n                        }\n                    ]\n                }\n            ]\n        },\n        {\n            \"type\": \"TextBlock\",\n            \"text\": \"@{triggerBody()['text_2']}: Hi @{items('Send_Card')?['StudentName']}, the module @{outputs('Get_item')?['body/Module/Value']} has been graded. Revisions are requested. Please open the Student App for more information.\",\n            \"wrap\": true\n        },\n        {\n            \"type\": \"ActionSet\",\n            \"horizontalAlignment\": \"Center\",\n            \"actions\": [\n                {\n                    \"type\": \"Action.OpenUrl\",\n                    \"title\": \"SkillsCenter Student App\",\n                    \"url\": \"https://apps.powerapps.com/play/e/default-3ded8b1b-070d-4629-82e4-c0b019f46057/a/829ee23f-d657-45ed-ac74-9a10a069fc59?tenantId=3ded8b1b-070d-4629-82e4-c0b019f46057&hint=2ff8728b-dfc7-45b4-8b7a-54285307fd4d&sourcetime=1755214557713/\"\n                }\n            ]\n        }\n    ]\n}"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            }
+          },
+          "runAfter": {
+            "Get_items": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "82946ab3-0e33-4102-b378-0a119f381b77"
+          },
+          "type": "Foreach"
+        },
+        "Compose:_CommaDelete": {
+          "runAfter": {
+            "Initialize_JSON_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "94f1327f-4a79-4200-a351-c129a76f26fa"
+          },
+          "type": "Compose",
+          "inputs": "@replace(triggerBody()?['text_1'], '\"', '''')"
+        },
+        "Try": {
+          "actions": {
+            "Update_file_properties": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "edc04352-c2f0-4441-85d6-63a1cba5b2f8"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "PatchFileItem",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+                  "table": "@parameters('Module Submissions (sc_shared_sharepointonline_8718b7b62d2f4b599968ee3d54611880)')",
+                  "id": "@outputs('Get_file_metadata')?['body/ItemId']",
+                  "item/DocumentType/Value": "Submission",
+                  "item/GradedDate": "@utcNow()",
+                  "item/ProctorComments": "@triggerBody()['text_1']"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            }
+          },
+          "runAfter": {
+            "Get_file_metadata": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "6814a91c-cbcb-4529-9a98-23b3c66d35f9"
+          },
+          "type": "Scope"
+        },
+        "Scope": {
+          "actions": {},
+          "runAfter": {
+            "Try": [
+              "Failed",
+              "Skipped",
+              "TimedOut",
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "8dc1fbd2-47d0-4b6c-8414-b5c8093110bf"
+          },
+          "type": "Scope"
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

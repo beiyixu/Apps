@@ -1,0 +1,498 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_excelonlinebusiness": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedexcelonlinebusiness_25d33"
+        },
+        "api": {
+          "name": "shared_excelonlinebusiness"
+        }
+      },
+      "shared_sharepointonline": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedsharepointonline_53863"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_teams": {
+        "runtimeSource": "invoker",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedteams_acb13"
+        },
+        "api": {
+          "name": "shared_teams"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)": {
+          "defaultValue": "d8f4f3b3-7691-480c-b6d8-98e78c0384c9",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b"
+          }
+        },
+        "CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)": {
+          "defaultValue": "https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter-Proctors",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645"
+          }
+        },
+        "Admin (new_shared_sharepointonline_6d567fd81de34f9dbe3ed65d256afd51)": {
+          "defaultValue": "a2c95619-575a-4912-bfaa-734256730ec6",
+          "type": "String",
+          "metadata": {
+            "schemaName": "new_shared_sharepointonline_6d567fd81de34f9dbe3ed65d256afd51"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "d07a804b-c6af-40fd-bfd3-3052a22b309d"
+          },
+          "type": "Request",
+          "kind": "PowerAppV2",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "UserEmail",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "List_rows_in_Enrollments": {
+          "runAfter": {},
+          "metadata": {
+            "01M35SWVTXAERU7OLWPNA3JNR7DIFMINRY": "/ActiveStudents.xlsx",
+            "operationMetadataId": "58dd834b-4771-484f-8fb9-d929ff061649",
+            "tableId": "{D2000340-9DDC-48A3-8B7D-E82212CB89DC}"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_excelonlinebusiness",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_excelonlinebusiness"
+            },
+            "parameters": {
+              "source": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "drive": "b!RbdVAVeaqUSSQ1lk0fthLMCN_1x1JApEgoSsJN6tVmJ3kdPA8cG6Qb91RTAVWh5D",
+              "file": "01M35SWVTXAERU7OLWPNA3JNR7DIFMINRY",
+              "table": "{D2000340-9DDC-48A3-8B7D-E82212CB89DC}"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Apply_to_Sharepoint": {
+          "foreach": "@outputs('List_rows_in_Enrollments')?['body/value']",
+          "actions": {
+            "Get_StudentSummary": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "87d525bb-9275-4366-9c0a-ae56d62310b9"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetItems",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+                  "table": "@parameters('StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)')",
+                  "$filter": "Title eq '@{items('Apply_to_Sharepoint')?['Student ID']}'"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            },
+            "Check_IsEmpty": {
+              "actions": {
+                "Condition_Admin": {
+                  "actions": {
+                    "Create_a_chat": {
+                      "runAfter": {
+                        "Compose:_Student_Email": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "46bef5a6-986a-4936-a57e-923a7e55a5c9"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_teams",
+                          "operationId": "CreateChat",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams"
+                        },
+                        "parameters": {
+                          "item/members": "@{outputs('Compose_Email_Array')};@{outputs('Compose:_Student_Email')}",
+                          "item/topic": "@{items('Apply_to_Sharepoint')?['FirstLast']} @{items('Apply_to_Sharepoint')?['Semester']}"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    },
+                    "Apply_to_each": {
+                      "foreach": "@outputs('Get_Admin')?['body/value']",
+                      "actions": {
+                        "Set_Initial_Email": {
+                          "runAfter": {},
+                          "metadata": {
+                            "operationMetadataId": "1ac3844b-180a-443c-a5e0-7f40c0e20c0b"
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Emails",
+                            "value": "@json(items('Apply_to_each')?['ProctorEmails'])"
+                          }
+                        }
+                      },
+                      "runAfter": {},
+                      "metadata": {
+                        "operationMetadataId": "09c4e658-8082-401b-b541-a25f2add84ac"
+                      },
+                      "type": "Foreach"
+                    },
+                    "Compose_Email_Array": {
+                      "runAfter": {
+                        "Filter_array": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "ed0dc1a1-34f9-4b3f-8dd8-a3bba38ba817"
+                      },
+                      "type": "Compose",
+                      "inputs": "@join(body('Filter_array'), ';')"
+                    },
+                    "Post_message_in_a_chat_or_channel": {
+                      "runAfter": {
+                        "Create_a_chat": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "ed163c46-97a6-4783-9174-d7e9c0f39b14"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_teams",
+                          "operationId": "PostMessageToConversation",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams"
+                        },
+                        "parameters": {
+                          "poster": "Flow bot",
+                          "location": "Group chat",
+                          "body/recipient": "@outputs('Create_a_chat')?['body/id']",
+                          "body/messageBody": "<p>Hello @{items('Apply_to_Sharepoint')?['FirstLast']}, this is a direct chat to reach our proctor team in the SkillsCenter.</p>"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    },
+                    "Create_StudentSummary_Item": {
+                      "runAfter": {
+                        "Post_message_in_a_chat_or_channel": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "7c40fc5a-4f86-4218-8548-dec1c3b2b1ee"
+                      },
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "host": {
+                          "connectionName": "shared_sharepointonline",
+                          "operationId": "PostItem",
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                        },
+                        "parameters": {
+                          "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+                          "table": "@parameters('StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)')",
+                          "item/Title": "@items('Apply_to_Sharepoint')?['Student ID']",
+                          "item/StudentName": "@items('Apply_to_Sharepoint')?['FirstLast']",
+                          "item/StudentEmail": "@outputs('Compose:_Student_Email')",
+                          "item/Class": "@items('Apply_to_Sharepoint')?['Class']",
+                          "item/Semester": "@items('Apply_to_Sharepoint')?['Semester']",
+                          "item/Status": "@items('Apply_to_Sharepoint')?['Status']",
+                          "item/CreditHours": "@items('Apply_to_Sharepoint')?['Credit Hours']",
+                          "item/ExpectedHours": 0,
+                          "item/TotalModuleHours": 0,
+                          "item/ModulePct": 0,
+                          "item/TotalSeminars": 0,
+                          "item/SeminarPct": 0,
+                          "item/BiweeklyReq": 0,
+                          "item/ParticipationPct": 0,
+                          "item/ExtraCreditHours": 0,
+                          "item/ExtraCreditPct": 0,
+                          "item/LabMeeting1": false,
+                          "item/LabMeeting2": false,
+                          "item/LabMeeting3": false,
+                          "item/LabMeeting4": false,
+                          "item/RolloverHours": 0,
+                          "item/FinalPct": 0,
+                          "item/Completed": "[]",
+                          "item/InProgress": "[]",
+                          "item/AlreadyCompleted": "[]",
+                          "item/SubmissionDates": "[]",
+                          "item/TotalModules": 0,
+                          "item/ConversationID": "@outputs('Create_a_chat')?['body/id']"
+                        },
+                        "authentication": "@parameters('$authentication')"
+                      }
+                    },
+                    "Filter_array": {
+                      "runAfter": {
+                        "Apply_to_each": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "4dcd4778-af7d-4ed5-ab9b-068f170156b9"
+                      },
+                      "type": "Query",
+                      "inputs": {
+                        "from": "@variables('Emails')",
+                        "where": "@not(equals(item(), triggerBody()['text']))"
+                      }
+                    },
+                    "Compose:_Student_Email": {
+                      "runAfter": {
+                        "Compose_Email_Array": [
+                          "Succeeded"
+                        ]
+                      },
+                      "metadata": {
+                        "operationMetadataId": "9d12d34e-9bc9-4f2c-8e83-85afe0c7b3f5"
+                      },
+                      "type": "Compose",
+                      "inputs": "@concat(items('Apply_to_Sharepoint')?['User ID'],'@colorado.edu')"
+                    }
+                  },
+                  "runAfter": {},
+                  "expression": {
+                    "equals": [
+                      "@empty(outputs('Get_Admin')?['body/value'])",
+                      false
+                    ]
+                  },
+                  "metadata": {
+                    "operationMetadataId": "d60aa2e9-3758-4e99-8118-ca3ab1b3d4af"
+                  },
+                  "type": "If"
+                }
+              },
+              "runAfter": {
+                "Get_Admin": [
+                  "Succeeded"
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Update_item": {
+                    "runAfter": {
+                      "Compose:_Student_Email_2": [
+                        "Succeeded"
+                      ]
+                    },
+                    "metadata": {
+                      "operationMetadataId": "b9abec58-6134-41f3-baef-bc10fcf6ac61"
+                    },
+                    "type": "OpenApiConnection",
+                    "inputs": {
+                      "host": {
+                        "connectionName": "shared_sharepointonline",
+                        "operationId": "PatchItem",
+                        "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                      },
+                      "parameters": {
+                        "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+                        "table": "@parameters('StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)')",
+                        "id": "@variables('ID')",
+                        "item/StudentName": "@items('Apply_to_Sharepoint')?['FirstLast']",
+                        "item/StudentEmail": "@outputs('Compose:_Student_Email_2')",
+                        "item/Class": "@items('Apply_to_Sharepoint')?['Class']",
+                        "item/Semester": "@items('Apply_to_Sharepoint')?['Semester']",
+                        "item/Status": "@items('Apply_to_Sharepoint')?['Status']",
+                        "item/CreditHours": "@items('Apply_to_Sharepoint')?['Credit Hours']"
+                      },
+                      "authentication": "@parameters('$authentication')"
+                    }
+                  },
+                  "Apply_ID": {
+                    "foreach": "@outputs('Get_StudentSummary')?['body/value']",
+                    "actions": {
+                      "Set_variable": {
+                        "runAfter": {},
+                        "metadata": {
+                          "operationMetadataId": "6fc5b475-a8ef-4673-acb0-6301f73e3c1b"
+                        },
+                        "type": "SetVariable",
+                        "inputs": {
+                          "name": "ID",
+                          "value": "@items('Apply_ID')?['ID']"
+                        }
+                      }
+                    },
+                    "runAfter": {},
+                    "metadata": {
+                      "operationMetadataId": "8257f874-f5df-42ba-8402-ff9d22bcffcb"
+                    },
+                    "type": "Foreach"
+                  },
+                  "Compose:_Student_Email_2": {
+                    "runAfter": {
+                      "Apply_ID": [
+                        "Succeeded"
+                      ]
+                    },
+                    "metadata": {
+                      "operationMetadataId": "9d12d34e-9bc9-4f2c-8e83-85afe0c7b3f5"
+                    },
+                    "type": "Compose",
+                    "inputs": "@concat(items('Apply_to_Sharepoint')?['User ID'], '@colorado.edu')"
+                  }
+                }
+              },
+              "expression": {
+                "equals": [
+                  "@empty(outputs('Get_StudentSummary')?['body/value'])",
+                  true
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "da938b2e-a8c7-45f2-8181-ef8339b19bb2"
+              },
+              "type": "If"
+            },
+            "Get_Admin": {
+              "runAfter": {
+                "Get_StudentSummary": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "52b055cd-aa65-4cb8-a5fa-cf7193e730f2"
+              },
+              "type": "OpenApiConnection",
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_sharepointonline",
+                  "operationId": "GetItems",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                },
+                "parameters": {
+                  "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+                  "table": "@parameters('Admin (new_shared_sharepointonline_6d567fd81de34f9dbe3ed65d256afd51)')",
+                  "$filter": "Title eq '@{items('Apply_to_Sharepoint')?['Semester']}'"
+                },
+                "authentication": "@parameters('$authentication')"
+              }
+            }
+          },
+          "runAfter": {
+            "Respond_to_a_Power_App_or_flow": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "d1de4aba-ad4c-4caf-9106-1e8d2a6dee06"
+          },
+          "type": "Foreach"
+        },
+        "Initialize_variable": {
+          "runAfter": {
+            "List_rows_in_Enrollments": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c3a46ea9-6a90-4a6f-84e5-941b11dd202c"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ID",
+                "type": "integer"
+              }
+            ]
+          }
+        },
+        "Initialize_variable_2": {
+          "runAfter": {
+            "Initialize_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "605d2d73-08e6-4392-941f-dba3bbb29d65"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Emails",
+                "type": "array",
+                "value": []
+              }
+            ]
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Initialize_variable_2": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "7b2c9c64-be08-4e2c-b1fc-c569c9370d81"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {},
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}

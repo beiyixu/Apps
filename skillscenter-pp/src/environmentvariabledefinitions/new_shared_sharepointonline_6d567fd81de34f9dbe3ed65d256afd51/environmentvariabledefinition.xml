@@ -1,0 +1,15 @@
+<environmentvariabledefinition schemaname="new_shared_sharepointonline_6d567fd81de34f9dbe3ed65d256afd51">
+  <apiid>/providers/microsoft.powerapps/apis/shared_sharepointonline</apiid>
+  <displayname default="Admin">
+    <label description="Admin" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0.0.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <parameterkey>table</parameterkey>
+  <parentdefinitionid>
+    <schemaname>sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645</schemaname>
+  </parentdefinitionid>
+  <secretstore>0</secretstore>
+  <type>100000004</type>
+</environmentvariabledefinition>

@@ -1,0 +1,1044 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedsharepointonline_53863"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        }
+      },
+      "shared_teams": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "sc_sharedteams_acb13"
+        },
+        "api": {
+          "name": "shared_teams"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "Modules (sc_shared_sharepointonline_303816cedaec429687b2388eb924bfd8)": {
+          "defaultValue": "b13972bb-cffa-49d4-b156-f6547afef576",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_303816cedaec429687b2388eb924bfd8"
+          }
+        },
+        "Module Submissions (sc_shared_sharepointonline_8718b7b62d2f4b599968ee3d54611880)": {
+          "defaultValue": "e5341daf-a469-46e7-be6f-40cc6183e771",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_8718b7b62d2f4b599968ee3d54611880"
+          }
+        },
+        "Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)": {
+          "defaultValue": "bf4f59de-896f-425d-8ec6-6c94b83a4264",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2"
+          }
+        },
+        "CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)": {
+          "defaultValue": "https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter-Proctors",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645"
+          }
+        },
+        "StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)": {
+          "defaultValue": "d8f4f3b3-7691-480c-b6d8-98e78c0384c9",
+          "type": "String",
+          "metadata": {
+            "schemaName": "sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b"
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "metadata": {
+            "operationMetadataId": "30937555-6bf4-4611-88db-6fec5cea20df"
+          },
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "StudentEmail",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "text_1": {
+                  "title": "Module",
+                  "type": "string",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please enter your input",
+                  "x-ms-content-hint": "TEXT"
+                },
+                "file": {
+                  "title": "File Content",
+                  "type": "object",
+                  "x-ms-dynamically-added": true,
+                  "description": "Please select file or image",
+                  "x-ms-content-hint": "FILE",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "contentBytes": {
+                      "type": "string",
+                      "format": "byte"
+                    }
+                  }
+                }
+              },
+              "required": [
+                "text",
+                "text_1"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Initialize_FileLocate_variable": {
+          "runAfter": {},
+          "metadata": {
+            "operationMetadataId": "6abfa990-bb07-4d10-9772-d7bfcf8f0544"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "FileLocate",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_StudentName_variable": {
+          "runAfter": {
+            "Initialize_FileLocate_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "1304a7af-7b45-42b6-8b6e-6ecb11eaafae"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "StudentName",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_StudentEmail_variable": {
+          "runAfter": {
+            "Initialize_StudentName_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "5b7786fc-3498-47a7-9361-9d95b7aa690e"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "StudentEmail",
+                "type": "string",
+                "value": "@triggerBody()['text']"
+              }
+            ]
+          }
+        },
+        "Initialize_StudentID_variable": {
+          "runAfter": {
+            "Initialize_StudentEmail_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "9989081b-37b4-4b38-9898-075a9fc379eb"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "StudentID",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_Module_variable": {
+          "runAfter": {
+            "Initialize_StudentID_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e69662f2-3561-43c7-ba67-f72499fd7c4a"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "Module",
+                "type": "string",
+                "value": "@triggerBody()['text_1']"
+              }
+            ]
+          }
+        },
+        "Get_Module_items": {
+          "runAfter": {
+            "Condition": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e0b46a1f-9e4c-4340-bcbb-a69c70404cf8"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Modules (sc_shared_sharepointonline_303816cedaec429687b2388eb924bfd8)')",
+              "$filter": "ModuleName eq '@{variables('Module')}'",
+              "$top": 1
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Initialize_ModuleID_variable": {
+          "runAfter": {
+            "Initialize_Module_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "184dd844-df76-410d-8505-88373528f4a6"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ModuleID",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Apply_Module": {
+          "foreach": "@outputs('Get_Module_items')?['body/value']",
+          "actions": {
+            "Set_ModuleID_variable": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "24cf4f9e-d54f-4b74-800a-3cd9c52c1646"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "ModuleID",
+                "value": "@items('Apply_Module')?['Title']"
+              }
+            },
+            "Set_ModuleInternalID_variable": {
+              "runAfter": {
+                "Set_ModuleID_variable": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "fc35cb51-6dca-456e-8612-e635573510df"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "ModuleInternalID",
+                "value": "@{items('Apply_Module')?['ID']}"
+              }
+            }
+          },
+          "runAfter": {
+            "Get_Module_items": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "0b2fd9a0-23fe-49f1-bd7a-5d4e5d46390c"
+          },
+          "type": "Foreach"
+        },
+        "Initialize_AttemptNumber_variable": {
+          "runAfter": {
+            "Get_Grades_items": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "40b76734-d557-4ec4-ad0e-29f1e922f6c9"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "AttemptNumber",
+                "type": "integer",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "Condition_Check_Module_Submission": {
+          "actions": {
+            "Compose_AttemptNumber": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "127772ea-2f00-42c7-9c50-63181ff248d1"
+              },
+              "type": "Compose",
+              "inputs": "@variables('AttemptNumber')"
+            },
+            "Set_AttemptNumber_variable_with_add": {
+              "runAfter": {
+                "Compose_AttemptNumber": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "a7fe355b-4e59-4f96-affa-803511d7fef7"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "AttemptNumber",
+                "value": "@add(int(outputs('Compose_AttemptNumber')), 1)"
+              }
+            }
+          },
+          "runAfter": {
+            "Apply_AttemptNumber": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Set_AttemptNumber_variable": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "e6695dc6-d632-4c84-9957-344eae6d6772"
+                },
+                "type": "SetVariable",
+                "inputs": {
+                  "name": "AttemptNumber",
+                  "value": 1
+                }
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@empty(\n  body('Get_Grades_items')?['value']\n)",
+              false
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "640488d5-50b4-4b69-b1d3-6b0d5dfaf88e"
+          },
+          "type": "If"
+        },
+        "Create_MMT_file": {
+          "runAfter": {
+            "Initialize_Document_Name_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "4ed945f1-7197-4e9c-8033-59157e07f519"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "CreateFile",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "folderPath": "/Module Submissions",
+              "name": "@variables('DocumentName')",
+              "body": "@triggerBody()['file']['contentBytes']"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          },
+          "runtimeConfiguration": {
+            "contentTransfer": {
+              "transferMode": "Chunked"
+            }
+          }
+        },
+        "Update_MMT_file_properties": {
+          "runAfter": {
+            "Create_MMT_file": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "8b7068c2-b2fc-4080-b2fe-8f343739f561"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "PatchFileItem",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Module Submissions (sc_shared_sharepointonline_8718b7b62d2f4b599968ee3d54611880)')",
+              "id": "@outputs('Create_MMT_file')?['body/ItemId']",
+              "item/StudentID": "@variables('StudentID')",
+              "item/ModuleID": "@variables('ModuleInternalID')",
+              "item/AttemptNumber": "@variables('AttemptNumber')",
+              "item/DocumentType/Value": "In Progress",
+              "item/SubmissionDate": "@utcNow()"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Condition_Check_Grades": {
+          "actions": {
+            "Update_Grades": {
+              "foreach": "@outputs('Get_Grades_items')?['body/value']",
+              "actions": {
+                "Update_Grade_item": {
+                  "runAfter": {},
+                  "metadata": {
+                    "operationMetadataId": "7fd06e5d-7662-4314-a182-f320a3f725cf"
+                  },
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connectionName": "shared_sharepointonline",
+                      "operationId": "PatchItem",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                    },
+                    "parameters": {
+                      "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+                      "table": "@parameters('Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)')",
+                      "id": "@items('Update_Grades')?['ID']",
+                      "item/Status/Value": "Resubmitted",
+                      "item/RecentSubmissionDate": "@utcNow()",
+                      "item/Attempts": "@variables('AttemptNumber')",
+                      "item/LatestSubmissionLink": "@outputs('Create_sharing_link_for_a_file_or_folder')?['body/link/webUrl']",
+                      "item/StudentRecordID": "@outputs('Update_MMT_file_properties')?['body/{Identifier}']",
+                      "item/SubmissionID": "@outputs('Create_MMT_file')?['body/ItemId']"
+                    },
+                    "authentication": {
+                      "type": "Raw",
+                      "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                    }
+                  }
+                }
+              },
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "affd5785-4180-493f-ba2a-004176854ce6"
+              },
+              "type": "Foreach"
+            }
+          },
+          "runAfter": {
+            "Create_sharing_link_for_a_file_or_folder": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Create_item": {
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "ef56fce0-102d-4d75-89f1-14abd6f34edb"
+                },
+                "type": "OpenApiConnection",
+                "inputs": {
+                  "host": {
+                    "connectionName": "shared_sharepointonline",
+                    "operationId": "PostItem",
+                    "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+                  },
+                  "parameters": {
+                    "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+                    "table": "@parameters('Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)')",
+                    "item/Title": "@variables('StudentModuleID')",
+                    "item/Test/Id": "@variables('StudentInternalID')",
+                    "item/Module/Id": "@float(variables('ModuleInternalID'))",
+                    "item/Status/Value": "Submitted",
+                    "item/SubmissionDate": "@utcNow()",
+                    "item/RecentSubmissionDate": "@utcNow()",
+                    "item/Attempts": "@variables('AttemptNumber')",
+                    "item/RawScore": "Unassigned",
+                    "item/CalculatedGrade": 0,
+                    "item/LatestSubmissionLink": "@outputs('Create_sharing_link_for_a_file_or_folder')?['body/link/webUrl']",
+                    "item/StudentRecordID": "@outputs('Update_MMT_file_properties')?['body/{Identifier}']",
+                    "item/SubmissionID": "@outputs('Create_MMT_file')?['body/ItemId']",
+                    "item/PlanningScore": 0,
+                    "item/MethodsScore": 0,
+                    "item/AnalysisScore": 0,
+                    "item/ConclusionScore": 0,
+                    "item/CitationsScore": 0,
+                    "item/FormatScore": 0,
+                    "item/MasteryScore": 0
+                  },
+                  "authentication": {
+                    "type": "Raw",
+                    "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+                  }
+                }
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@empty(outputs('Get_Grades_items')?['body/value'])",
+              false
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "203f8ac6-0a0f-4bca-b9f5-4f324ff45a41"
+          },
+          "type": "If"
+        },
+        "Initialize_StudentModuleID_variable": {
+          "runAfter": {
+            "Apply_Module": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "184dd844-df76-410d-8505-88373528f4a6"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "StudentModuleID",
+                "type": "string",
+                "value": "@{concat(variables('StudentID'), '-', variables('ModuleID'))}"
+              }
+            ]
+          }
+        },
+        "Create_sharing_link_for_a_file_or_folder": {
+          "runAfter": {
+            "Update_MMT_file_properties": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "1d842d11-1142-436a-a4f5-972cb71fc16b"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "CreateSharingLink",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Module Submissions (sc_shared_sharepointonline_8718b7b62d2f4b599968ee3d54611880)')",
+              "id": "@outputs('Create_MMT_file')?['body/ItemId']",
+              "permission/type": "view",
+              "permission/scope": "organization"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Initialize_Document_Name_variable": {
+          "runAfter": {
+            "Condition_Check_Module_Submission": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "19549a46-45fd-4fa7-a811-bbd588ffbd37"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "DocumentName",
+                "type": "string",
+                "value": "@{variables('StudentID')}-@{variables('ModuleID')}-@{variables('AttemptNumber')}.docx"
+              }
+            ]
+          }
+        },
+        "Get_Student_Summary_items": {
+          "runAfter": {
+            "Initialize_StudentInternalID_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "edce6571-5b38-4f3a-83d4-5f49e3455813"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('StudentSummary (sc_shared_sharepointonline_6181fa7e4038462386b154e3e3790b3b)')",
+              "$filter": "StudentEmail eq '@{triggerBody()['text']}'",
+              "$top": 1
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Condition": {
+          "actions": {
+            "Respond_to_a_Power_App_or_flow_4": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "abf289ae-5c11-4a43-ac94-ea2fb5a985b8"
+              },
+              "type": "Response",
+              "kind": "PowerApp",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "status": "NotStudent"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "title": "Status",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "Terminate": {
+              "runAfter": {
+                "Respond_to_a_Power_App_or_flow_4": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "4b8d219c-c0a1-4770-8d7d-b96ad8c177a2"
+              },
+              "type": "Terminate",
+              "inputs": {
+                "runStatus": "Cancelled"
+              }
+            }
+          },
+          "runAfter": {
+            "Apply_Student": [
+              "Succeeded"
+            ]
+          },
+          "else": {
+            "actions": {
+              "Apply_StudentInternalID": {
+                "foreach": "@outputs('Get_Student_Summary_items')?['body/value']",
+                "actions": {
+                  "Set_StudentInternalID_variable": {
+                    "runAfter": {},
+                    "metadata": {
+                      "operationMetadataId": "731a3e71-05f2-4207-9827-dcb6c5f7253f"
+                    },
+                    "type": "SetVariable",
+                    "inputs": {
+                      "name": "StudentInternalID",
+                      "value": "@{items('Apply_StudentInternalID')?['ID']}"
+                    }
+                  },
+                  "Set_StudentID_variable": {
+                    "runAfter": {
+                      "Set_StudentInternalID_variable": [
+                        "Succeeded"
+                      ]
+                    },
+                    "metadata": {
+                      "operationMetadataId": "1b555e62-f3e7-4fe9-8cc6-814902b4c179"
+                    },
+                    "type": "SetVariable",
+                    "inputs": {
+                      "name": "StudentID",
+                      "value": "@items('Apply_StudentInternalID')?['Title']"
+                    }
+                  }
+                },
+                "runAfter": {},
+                "metadata": {
+                  "operationMetadataId": "d3bee38f-dad4-45a9-92d0-fa4b4e1b4001"
+                },
+                "type": "Foreach"
+              }
+            }
+          },
+          "expression": {
+            "equals": [
+              "@empty(outputs('Get_Student_Summary_items')?['body/value'])",
+              true
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "e275fec0-7b4e-482f-93b1-b1812733b490"
+          },
+          "type": "If"
+        },
+        "Initialize_StudentInternalID_variable": {
+          "runAfter": {
+            "Initialize_ModuleInternalID_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "47f7e77a-55dc-41f4-b026-9b7068ca15b5"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "StudentInternalID",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Initialize_ModuleInternalID_variable": {
+          "runAfter": {
+            "Initialize_ModuleID_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c8194ba3-fc9a-47e2-b4a0-408b8afefff2"
+          },
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "ModuleInternalID",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "Respond_to_a_Power_App_or_flow": {
+          "runAfter": {
+            "Condition_Check_Grades": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a2852829-6d9a-4891-895b-1c33bde61ba6"
+          },
+          "type": "Response",
+          "kind": "PowerApp",
+          "inputs": {
+            "statusCode": 200,
+            "body": {
+              "status": "Success"
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "title": "Status",
+                  "x-ms-dynamically-added": true,
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "Get_Grades_items": {
+          "runAfter": {
+            "Initialize_StudentModuleID_variable": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "fe60e4eb-0305-47e4-81f4-42e96f54207d"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_sharepointonline",
+              "operationId": "GetItems",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline"
+            },
+            "parameters": {
+              "dataset": "@parameters('CU Boulder Skills Center - Proctors - https://o365coloradoedu.sharepoint.com/sites/MCDB-SkillsCenter (sc_shared_sharepointonline_6ca1f56c6e5d41cbbfad9b651f119645)')",
+              "table": "@parameters('Grades (sc_shared_sharepointonline_61ef0df0bb334514941ba2313d47f2e2)')",
+              "$filter": "TestId eq @{ float(variables('StudentInternalID'))} and ModuleId eq @{ float(variables('ModuleInternalID'))}",
+              "$top": 1
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Apply_AttemptNumber": {
+          "foreach": "@outputs('Get_Grades_items')?['body/value']",
+          "actions": {
+            "Compose_InitialAttemptNumber": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "649e6ced-88db-4206-bbb3-a7eed9a901f0"
+              },
+              "type": "Compose",
+              "inputs": "@items('Apply_AttemptNumber')?['Attempts']"
+            },
+            "Set_AttemptNumber_variable_initial": {
+              "runAfter": {
+                "Compose_InitialAttemptNumber": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "ef72fdbb-fe8d-4479-91c6-3435c42478a8"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "AttemptNumber",
+                "value": "@int(outputs('Compose_InitialAttemptNumber'))"
+              }
+            }
+          },
+          "runAfter": {
+            "Check_if_Completed": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "31869296-00c3-4792-9d73-ba85dea26e33"
+          },
+          "type": "Foreach"
+        },
+        "Check_if_Submitted": {
+          "actions": {
+            "Respond_to_a_Power_App_or_flow_2": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "a14bf5b3-9608-40a0-a7fd-b81b5f9b24bc"
+              },
+              "type": "Response",
+              "kind": "PowerApp",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "status": "AlreadySubmitted"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "title": "Status",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "Terminate_2": {
+              "runAfter": {
+                "Respond_to_a_Power_App_or_flow_2": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "36a5d1ce-ce6c-4f1e-968d-799eb1703173"
+              },
+              "type": "Terminate",
+              "inputs": {
+                "runStatus": "Cancelled"
+              }
+            }
+          },
+          "runAfter": {
+            "Initialize_AttemptNumber_variable": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "equals": [
+              "@first(body('Get_Grades_items')?['value'])?['Status']?['Value']",
+              "Submitted"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "1ebc1fe4-d78c-4879-84ab-a4be4f4e660e"
+          },
+          "type": "If"
+        },
+        "Check_if_Completed": {
+          "actions": {
+            "Respond_to_a_Power_App_or_flow_3": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "02ffdf5d-72ca-43c1-ad30-44315b3071c3"
+              },
+              "type": "Response",
+              "kind": "PowerApp",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "status": "AlreadyCompleted"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "title": "Status",
+                      "x-ms-dynamically-added": true,
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "Terminate_3": {
+              "runAfter": {
+                "Respond_to_a_Power_App_or_flow_3": [
+                  "Succeeded"
+                ]
+              },
+              "metadata": {
+                "operationMetadataId": "9a4d02d8-2122-45a6-877c-b247974fe394"
+              },
+              "type": "Terminate",
+              "inputs": {
+                "runStatus": "Cancelled"
+              }
+            }
+          },
+          "runAfter": {
+            "Check_if_Submitted": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "equals": [
+              "@first(body('Get_Grades_items')?['value'])?['Status']?['Value']",
+              "Completed"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "a5079fd4-bba2-4e5d-a36f-27c4eaf783b4"
+          },
+          "type": "If"
+        },
+        "Post_card_in_a_chat_or_channel": {
+          "runAfter": {
+            "Respond_to_a_Power_App_or_flow": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "c88f3ef9-3084-498b-b148-6bbee57a2ef1"
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_teams",
+              "operationId": "PostCardToConversation",
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_teams"
+            },
+            "parameters": {
+              "poster": "Flow bot",
+              "location": "Chat with Flow bot",
+              "body/recipient": "@{variables('StudentEmail')};",
+              "body/messageBody": "{\n    \"type\": \"AdaptiveCard\",\n    \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n    \"version\": \"1.3\",\n    \"body\": [\n        {\n            \"type\": \"ColumnSet\",\n            \"columns\": [\n                {\n                    \"type\": \"Column\",\n                    \"width\": \"auto\",\n                    \"items\": [\n                        {\n                            \"type\": \"Image\",\n                            \"url\": \"https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Colorado_Buffaloes_logo.svg/1200px-Colorado_Buffaloes_logo.svg.png\",\n                            \"altText\": \"CU\",\n                            \"size\": \"Medium\"\n                        }\n                    ]\n                },\n                {\n                    \"type\": \"Column\",\n                    \"width\": \"stretch\",\n                    \"items\": [\n                        {\n                            \"type\": \"TextBlock\",\n                            \"text\": \"University Of Colorado Boulder\",\n                            \"wrap\": true,\n                            \"size\": \"Medium\",\n                            \"weight\": \"Bolder\",\n                            \"spacing\": \"Small\"\n                        },\n                        {\n                            \"type\": \"TextBlock\",\n                            \"text\": \"MCDB1234/3456 SkillsCenter\",\n                            \"wrap\": true,\n                            \"spacing\": \"Small\"\n                        }\n                    ]\n                }\n            ]\n        },\n        {\n            \"type\": \"TextBlock\",\n            \"text\": \"Automated Submission Message: Hi @{variables('StudentName')},  your @{variables('Module')} module has been submitted. Please await for our proctors to review your module.\",\n            \"wrap\": true\n        },\n        {\n            \"type\": \"ActionSet\",\n            \"horizontalAlignment\": \"Center\",\n            \"actions\": [\n                {\n                    \"type\": \"Action.OpenUrl\",\n                    \"title\": \"SkillsCenter Student App\",\n                    \"url\": \"https://apps.powerapps.com/play/e/default-3ded8b1b-070d-4629-82e4-c0b019f46057/a/829ee23f-d657-45ed-ac74-9a10a069fc59?tenantId=3ded8b1b-070d-4629-82e4-c0b019f46057&hint=2ff8728b-dfc7-45b4-8b7a-54285307fd4d&sourcetime=1755214557713\"\n                }\n            ]\n        }\n    ]\n}"
+            },
+            "authentication": {
+              "type": "Raw",
+              "value": "@json(decodeBase64(triggerOutputs().headers['X-MS-APIM-Tokens']))['$ConnectionKey']"
+            }
+          }
+        },
+        "Apply_Student": {
+          "foreach": "@outputs('Get_Student_Summary_items')?['body/value']",
+          "actions": {
+            "Set_StudentName": {
+              "runAfter": {},
+              "metadata": {
+                "operationMetadataId": "0ec7ac0e-fb9f-45b8-8e43-ffd9bea89c12"
+              },
+              "type": "SetVariable",
+              "inputs": {
+                "name": "StudentName",
+                "value": "@items('Apply_Student')?['StudentName']"
+              }
+            }
+          },
+          "runAfter": {
+            "Get_Student_Summary_items": [
+              "Succeeded"
+            ]
+          },
+          "metadata": {
+            "operationMetadataId": "2ab55380-f884-4c0f-a19e-ba58ca35398d"
+          },
+          "type": "Foreach"
+        }
+      }
+    },
+    "templateName": ""
+  },
+  "schemaVersion": "1.0.0.0"
+}
