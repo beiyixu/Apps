@@ -3,3 +3,4 @@ out/
 *.msapp
 *.dataverse
 *.user
+src/environmentvariabledefinitions

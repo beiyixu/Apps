@@ -6,7 +6,7 @@
       <LocalizedName description="SkillsCenter" languagecode="1033" />
     </LocalizedNames>
     <Descriptions />
-    <Version>1.0.0.1</Version>
+    <Version>1.0.0.3</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>SkillsCenter</UniqueName>
@@ -95,6 +95,7 @@
       <RootComponent type="29" id="{b3bce012-4a63-f011-bec2-00224832075a}" behavior="0" />
       <RootComponent type="29" id="{efa70248-8b69-f011-bec1-00224832075a}" behavior="0" />
       <RootComponent type="300" schemaName="sc_skillscenterproctorsapp2025_77a72" behavior="0" />
+      <RootComponent type="300" schemaName="sc_skillscenterstudentapp_6e886" behavior="0" />
     </RootComponents>
     <MissingDependencies />
   </SolutionManifest>

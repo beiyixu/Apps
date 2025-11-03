@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CanvasApp xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name>sc_skillscenterstudentapp_6e886</Name>
+  <AppVersion>2025-11-03T18:23:16Z</AppVersion>
+  <Status>Ready</Status>
+  <CreatedByClientVersion>3.25101.19.0</CreatedByClientVersion>
+  <MinClientVersion>3.25101.19.0</MinClientVersion>
+  <Tags>{"primaryDeviceWidth":"1366","primaryDeviceHeight":"768","supportsPortrait":"true","supportsLandscape":"true","primaryFormFactor":"Tablet","showStatusBar":"false","publisherVersion":"3.25101.19","minimumRequiredApiVersion":"2.2.0","hasComponent":"true","hasUnlockedComponent":"true","isUnifiedRootApp":"false","sienaVersion":"20250914T200654Z-3.25084.7.0"}</Tags>
+  <IsCdsUpgraded>0</IsCdsUpgraded>
+  <GalleryItemId xsi:nil="true"></GalleryItemId>
+  <BackgroundColor>rgba(0, 0, 0, 1)</BackgroundColor>
+  <DisplayName>SkillsCenter Student App</DisplayName>
+  <Description xsi:nil="true"></Description>
+  <CommitMessage xsi:nil="true"></CommitMessage>
+  <Publisher xsi:nil="true"></Publisher>
+  <AuthorizationReferences>[]</AuthorizationReferences>
+  <ConnectionReferences>{"7851443e-6ab3-4603-9b45-87257c740849":{"id":"/providers/microsoft.powerapps/apis/shared_logicflows","displayName":"Logic flows","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/v1.0.1774/1.0.1774.4397/logicflows/icon.png","dataSources":["SubmitModule"],"dependencies":[],"dependents":[],"parameterHints":{"workflowName":{"value":"755668e6-d607-45bf-8db4-f7a76bff165a"},"workflowEntityId":{"value":"2ef436ab-a169-f011-bec1-00224832075a"},"workflowDisplayName":{"value":"SubmitModule"}},"parameterHintsV2":{"workflowName":{"value":"755668e6-d607-45bf-8db4-f7a76bff165a"},"workflowEntityId":{"value":"2ef436ab-a169-f011-bec1-00224832075a"},"workflowDisplayName":{"value":"SubmitModule"}},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard","actions":["Run"]},"8aa5b18e-7e70-4237-93c2-5cf89f883b15":{"id":"/providers/microsoft.powerapps/apis/shared_logicflows","displayName":"Logic flows","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/v1.0.1774/1.0.1774.4397/logicflows/icon.png","dataSources":["ReadPDF"],"dependencies":["d2764e18-559f-4d17-8cf7-a09260505c1d"],"dependents":[],"parameterHints":{"workflowName":{"value":"b02f49cf-c3ce-4612-9cff-47c4385c660e"},"workflowEntityId":{"value":"ae6bcdaf-3163-f011-bec2-00224832075a"},"workflowDisplayName":{"value":"ReadPDF"},"d2764e18-559f-4d17-8cf7-a09260505c1d":{"value":"shared_sharepointonline"}},"parameterHintsV2":{"workflowName":{"value":"b02f49cf-c3ce-4612-9cff-47c4385c660e"},"workflowEntityId":{"value":"ae6bcdaf-3163-f011-bec2-00224832075a"},"workflowDisplayName":{"value":"ReadPDF"},"shared_sharepointonline":{"value":"d2764e18-559f-4d17-8cf7-a09260505c1d"}},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard","actions":["Run"]},"d2764e18-559f-4d17-8cf7-a09260505c1d":{"id":"/providers/microsoft.powerapps/apis/shared_sharepointonline","displayName":"SharePoint","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/v1.0.1769/1.0.1769.4352/sharepointonline/icon.png","dataSources":[],"dependencies":[],"dependents":["8aa5b18e-7e70-4237-93c2-5cf89f883b15"],"parameterHints":{},"parameterHintsV2":{},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard"},"dd243c99-0560-4789-83c1-07f480d7fdd7":{"id":"/providers/microsoft.powerapps/apis/shared_office365users","displayName":"Office 365 Users","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/releases/v1.0.1777/1.0.1777.4410/office365users/icon.png","dataSources":["Office365Users"],"dependencies":[],"dependents":[],"parameterHints":{},"parameterHintsV2":{},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard","actions":["UserProfile"]},"4e48dd8b-2176-44af-9b82-8dffb13083a8":{"id":"/providers/microsoft.powerapps/apis/shared_logicflows","displayName":"Logic flows","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/v1.0.1774/1.0.1774.4397/logicflows/icon.png","dataSources":["GetStudentsGrades"],"dependencies":[],"dependents":[],"parameterHints":{"workflowName":{"value":"8ba41158-d80e-49b1-a845-b7cc5d6e1d35"},"workflowEntityId":{"value":"0ba5b5eb-8a69-f011-bec1-00224832075a"},"workflowDisplayName":{"value":"GetStudentsGrades"}},"parameterHintsV2":{"workflowName":{"value":"8ba41158-d80e-49b1-a845-b7cc5d6e1d35"},"workflowEntityId":{"value":"0ba5b5eb-8a69-f011-bec1-00224832075a"},"workflowDisplayName":{"value":"GetStudentsGrades"}},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard","actions":["Run"]},"17ff7722-bc5e-40d1-a094-8210639c3cf8":{"id":"/providers/microsoft.powerapps/apis/shared_logicflows","displayName":"Logic flows","iconUri":"https://conn-afd-prod-endpoint-bmc9bqahasf3grgk.b01.azurefd.net/v1.0.1774/1.0.1774.4397/logicflows/icon.png","dataSources":["GetModules"],"dependencies":[],"dependents":[],"parameterHints":{"workflowName":{"value":"511c5948-eb6a-4a69-bd83-3131fe6bd20f"},"workflowEntityId":{"value":"b344863d-927f-f011-b4cc-00224832075a"},"workflowDisplayName":{"value":"GetModules"}},"parameterHintsV2":{"workflowName":{"value":"511c5948-eb6a-4a69-bd83-3131fe6bd20f"},"workflowEntityId":{"value":"b344863d-927f-f011-b4cc-00224832075a"},"workflowDisplayName":{"value":"GetModules"}},"isOnPremiseConnection":false,"bypassConsent":false,"dataSets":{},"apiTier":"Standard","actions":["Run"]}}</ConnectionReferences>
+  <DatabaseReferences>{}</DatabaseReferences>
+  <AppComponents>[]</AppComponents>
+  <AppComponentDependencies>[]</AppComponentDependencies>
+  <CanConsumeAppPass>1</CanConsumeAppPass>
+  <CanvasAppType>0</CanvasAppType>
+  <BypassConsent>0</BypassConsent>
+  <AdminControlBypassConsent>0</AdminControlBypassConsent>
+  <EmbeddedApp xsi:nil="true"></EmbeddedApp>
+  <IntroducedVersion>1.0</IntroducedVersion>
+  <CdsDependencies>{"cdsdependencies":[{"dependencyid":"2ef436ab-a169-f011-bec1-00224832075a","componenttype":29,"componenttypeplatformname":"Workflow"},{"dependencyid":"ae6bcdaf-3163-f011-bec2-00224832075a","componenttype":29,"componenttypeplatformname":"Workflow"},{"dependencyid":"0ba5b5eb-8a69-f011-bec1-00224832075a","componenttype":29,"componenttypeplatformname":"Workflow"},{"dependencyid":"b344863d-927f-f011-b4cc-00224832075a","componenttype":29,"componenttypeplatformname":"Workflow"}]}</CdsDependencies>
+  <IsCustomizable>1</IsCustomizable>
+  <BackgroundImageUri>/CanvasApps/sc_skillscenterstudentapp_6e886_BackgroundImageUri</BackgroundImageUri>
+  <DocumentUri>/CanvasApps/sc_skillscenterstudentapp_6e886_DocumentUri.msapp</DocumentUri>
+  <AdditionalUris>
+    <AdditionalUri>/CanvasApps/sc_skillscenterstudentapp_6e886_AdditionalUris0_identity.json</AdditionalUri>
+  </AdditionalUris>
+</CanvasApp>
